@@ -126,6 +126,7 @@ public class TaskManager {
     private static void calculateStatus(Epic epic) {
         ArrayList<Subtask> subtaskList = epic.getSubtasks();
 
+
         for (Subtask substack : subtaskList) {
             if (subtaskList.isEmpty() || substack.status.equals(TaskStatus.NEW)) {
                 epic.setStatus("NEW");
