@@ -6,16 +6,17 @@ public class Task {
     TaskManager taskManager = new TaskManager();
     public String taskName;
     public String taskDescription;
-    public String status;
+    public TaskStatus status;
     public int taskId;
 
-    public Task(String taskName, String taskDescription, String status) {
+    public Task(String taskName, String taskDescription, TaskStatus status) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.status = status;
     }
 
     public Task() {
+
     }
 
     public String getTaskName() { return taskName; }
@@ -26,9 +27,9 @@ public class Task {
 
     public void setTaskDescription(String taskDescription) { this.taskDescription = taskDescription; }
 
-    public String getStatus() { return status; }
+    public TaskStatus getStatus() { return status; }
 
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(TaskStatus status) { this.status = status; }
 
     public void setTaskId(int id) {
         this.taskId = id;
@@ -41,17 +42,10 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "taskManager=" + taskManager +
-                ", taskName='" + taskName + '\'' +
-                ", taskDescription='" + taskDescription + '\'' +
-                ", status='" + status + '\'' +
-                ", taskId=" + taskId +
+                "taskName='" + taskName + '\'' +
+                " ,taskDescription='" + taskDescription + '\'' +
+                " ,status='" + status + '\'' +
+                " ,taskId=" + taskId +
                 '}';
     }
-
-/*    public enum model.TaskStatus {
-        NEW,
-        IN_PROGRESS,
-        DONE
-    }*/
 }

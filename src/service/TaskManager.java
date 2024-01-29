@@ -9,7 +9,6 @@ import java.util.ArrayList;
 public class TaskManager {
 
 
-    // Хранить все задачи
     HashMap<Integer, Task> tasks;
     HashMap<Integer, Epic> epics = new HashMap<>();
     HashMap<Integer, Subtask> subtasks = new HashMap<>();
@@ -23,8 +22,6 @@ public class TaskManager {
     public TaskManager() {
         this.tasks = new HashMap<>();
     }
-
-    // Методы для Задачи/Эпика/Подзадача
 
     public void printListOfAllTasks() {
         System.out.println(tasks);
@@ -66,31 +63,57 @@ public class TaskManager {
         subtask.setTaskId(generateId());
         Epic epic = subtask.getEpic();
         epic.setSubtasks(epic.getSubtasks());
-        tasks.put(subtask.getTaskId(), subtask );
+        subtasks.put(subtask.getTaskId(), subtask);
         calculateStatus(epic);
         return subtask;
 
     }
 
+    public Epic createEpic(Epic epic) {
+        epic.setTaskId(generateId());
+        epics.put(epic.getTaskId(), epic);
+        return epic;
+    }
+
     public void taskUpdate(Task task) {
+        Task saved = tasks.get(task.getTaskId());
+
+        if (saved == null) {
+            return;
+        }
+
+        saved.setTaskName(task.getTaskName());
+        saved.setTaskDescription(task.getTaskDescription());
+        saved.setStatus(task.getStatus());
         tasks.put(task.getTaskId(), task);
     }
 
     public void epicUpdate(Epic epic) {
         Epic saved = epics.get(epic.getTaskId());
+
         if (saved == null) {
             return;
         }
+
         saved.setTaskName(epic.getTaskName());
         saved.setTaskDescription(epic.getTaskDescription());
-        epics.put(epic.taskId, epic);
-        //epics.put(saved.taskId, epic);
+        saved.setStatus(epic.getStatus());
+        epics.put(saved.taskId, epic);
+        calculateStatus(epic);
 
     }
 
     public void subtaskUpdate(Subtask subtask) {
-        subtasks.put(subtask.getTaskId(), subtask);
+        Subtask saved = subtasks.get(subtask.getTaskId());
 
+        if (saved == null) {
+            return;
+        }
+
+        saved.setTaskName(subtask.getTaskName());
+        saved.setTaskName(subtask.getTaskDescription());
+        saved.setStatus(subtask.getStatus());
+        subtasks.put(subtask.getTaskId(), subtask);
 
     }
 
@@ -115,33 +138,52 @@ public class TaskManager {
             System.out.println("Такого id не существует");
             return;
         }
+        ArrayList<Subtask> subList = getEpicPerId(epicId).getSubtasks();
+
+        for (Subtask sub : subList) {
+            subtasks.remove(sub.getTaskId());
+        }
         epics.remove(epicId);
+
 
     }
 
     public ArrayList<Subtask> getSubtaskPerEpic(Epic epic) {
+
         return epic.getSubtasks();
     }
 
-    private static void calculateStatus(Epic epic) {
+    public static void calculateStatus(Epic epic) {
         ArrayList<Subtask> subtaskList = epic.getSubtasks();
+        int countNew = 0;
+        int countInProgress = 0;
+        int countDone = 0;
 
+        int listLength = subtaskList.size();
 
         for (Subtask substack : subtaskList) {
+
+
             if (subtaskList.isEmpty() || substack.status.equals(TaskStatus.NEW)) {
-                epic.setStatus("NEW");
+                countNew++;
+                if (countNew == listLength) {
+                    epic.setStatus(TaskStatus.NEW);
+                }
 
             } else if (substack.status.equals(TaskStatus.IN_PROGRESS)) {
-                epic.setStatus("IN_PROGRESS");
+                countInProgress++;
+                if (countInProgress == listLength){
+                    epic.setStatus(TaskStatus.IN_PROGRESS);
+                }
 
             } else if (substack.status.equals(TaskStatus.DONE)) {
-                epic.setStatus("DONE");
+                countDone++;
+                if (countDone == listLength) {
+                    epic.setStatus(TaskStatus.DONE);
+                }
             }
         }
 
-
-
     }
-
 
 }
