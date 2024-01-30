@@ -152,15 +152,23 @@ public class TaskManager {
             System.out.println("Такого id не существует");
             return;
         }
-        epics.get(epicId).getSubtasks().clear();
+        final Epic epic = epics.remove(epicId);
+        for (Integer subId : epic.getSubtasks()) {
+            subtasks.remove(subId);
+        }
 
         epics.remove(epicId);
 
     }
 
-    public ArrayList<Integer> getSubtaskPerEpic(Epic epic) {
+    public ArrayList<Subtask> getSubtaskPerEpic(Epic epic) {
 
-        return epic.getSubtasks();
+        ArrayList<Subtask> subtasksList = new ArrayList<>();
+
+        for (Integer subId : epic.getSubtasks()) {
+            subtasksList.add(subtasks.get(subId));
+        }
+        return subtasksList;
     }
 
     public void calculateStatus(Epic epic) {

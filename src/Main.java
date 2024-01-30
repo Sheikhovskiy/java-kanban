@@ -45,6 +45,7 @@ public class Main {
         System.out.println(subtask1);
         System.out.println(subtask2);
         System.out.println(subtask3);
+        System.out.println(taskManager.getSubtaskPerEpic(epic1));
 
         task1.setStatus(TaskStatus.DONE);
         task2.setStatus(TaskStatus.IN_PROGRESS);
