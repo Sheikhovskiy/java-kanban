@@ -27,11 +27,11 @@ public class Main {
         taskManager.createEpic(epic2);
 
         ArrayList<Subtask> subTasksList1 = new ArrayList<>();
-        Subtask subtask1 = new Subtask(epic1.getTaskId(), "Первая подзадача", "Описание 1", TaskStatus.NEW, 5);
-        Subtask subtask2 = new Subtask(epic1.getTaskId(), "Вторая подзадача", "Описание 2", TaskStatus.NEW, 6);
+        Subtask subtask1 = new Subtask(epic1.getTaskId(), "Первая подзадача", "Описание 1", TaskStatus.NEW);
+        Subtask subtask2 = new Subtask(epic1.getTaskId(), "Вторая подзадача", "Описание 2", TaskStatus.NEW);
 
         ArrayList<Subtask> subsTasksList2 = new ArrayList<>();
-        Subtask subtask3 = new Subtask(epic2.getTaskId(), "Третья подзадача", "Описание 3", TaskStatus.NEW, 7);
+        Subtask subtask3 = new Subtask(epic2.getTaskId(), "Третья подзадача", "Описание 3", TaskStatus.NEW);
 
 
         taskManager.createSubtask(subtask1);
