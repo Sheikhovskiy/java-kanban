@@ -1,9 +1,6 @@
 package model;
 
-import service.TaskManager;
-
 public class Task {
-    TaskManager taskManager = new TaskManager();
     public String taskName;
     public String taskDescription;
     public TaskStatus status;
@@ -13,6 +10,13 @@ public class Task {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.status = status;
+    }
+
+    public Task(String taskName, String taskDescription, TaskStatus status, int id) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.status = status;
+        this.taskId = id;
     }
 
     public Task() {
