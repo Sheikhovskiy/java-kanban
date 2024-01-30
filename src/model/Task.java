@@ -1,10 +1,10 @@
 package model;
 
 public class Task {
-    public String taskName;
-    public String taskDescription;
-    public TaskStatus status;
-    public int taskId;
+    private String taskName;
+    private String taskDescription;
+    private TaskStatus status;
+    private int taskId;
 
     public Task(String taskName, String taskDescription, TaskStatus status) {
         this.taskName = taskName;

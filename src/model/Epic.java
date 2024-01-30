@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class Epic extends Task {
 
-    protected ArrayList<Subtask> subtasks = new ArrayList<>();
+    protected ArrayList<Integer> subtasksId = new ArrayList<>();
 
 
     public Epic(String taskName, String taskDescription, TaskStatus status) {
@@ -21,22 +21,24 @@ public class Epic extends Task {
     public Epic() {
 
     }
-    public ArrayList<Subtask> getSubtasks() {
-        return subtasks;
+    public ArrayList<Integer> getSubtasks() {
+        return subtasksId;
     }
 
     public void setSubtasks(Subtask subtask) {
-        this.subtasks.add(subtask);
+
+        this.subtasksId.add(subtask.getTaskId());
     }
+
 
     @Override
     public String toString() {
         return "Epic{" +
-                "subtasks=" + subtasks +
-                ", taskName='" + taskName + '\'' +
-                ", taskDescription='" + taskDescription + '\'' +
-                ", status=" + status +
-                ", taskId=" + taskId +
+                "subtasksId=" + subtasksId +
+                ", taskName='" + getTaskName() + '\'' +
+                ", taskDescription='" + getTaskDescription() + '\'' +
+                ", status=" + getStatus() +
+                ", taskId=" + getTaskId() +
                 '}';
     }
 
@@ -45,7 +47,7 @@ public class Epic extends Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Epic epic = (Epic) o;
-        return Objects.equals(subtasks, epic.subtasks);
+        return Objects.equals(subtasksId, epic.subtasksId);
     }
 
 }
