@@ -1,24 +1,14 @@
 package service;
-<<<<<<< HEAD
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import java.util.ArrayList;
-import model.TaskStatus;
-
-public interface TaskManager {
-=======
-
-import model.Epic;
-import model.Subtask;
-import model.Task;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import model.TaskStatus;
+
 public interface TaskManager {
 
->>>>>>> 4c2c45b (Небольшие доработки)
         void deleteAllTasks();
         void deleteAllSubtasks();
         void deleteAllEpics();
@@ -36,11 +26,6 @@ public interface TaskManager {
         void deleteEpicById(int epicId);
         ArrayList<Subtask> getSubtaskPerEpic(Epic epic);
 
-<<<<<<< HEAD
-        ArrayList<Task> getHistory();
-
-=======
         List<Task> getHistory();
->>>>>>> 4c2c45b (Небольшие доработки)
 
 }
