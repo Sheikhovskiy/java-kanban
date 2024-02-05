@@ -1,5 +1,4 @@
 package service;
-import service.InMemoryHistoryManager;
 
 public class Managers {
 
@@ -9,7 +8,7 @@ public class Managers {
 
     }
 
-    public static InMemoryHistoryManager getDefaultHistory() {
+    public static HistoryManager getDefaultHistory() {
         return new InMemoryHistoryManager();
     }
 

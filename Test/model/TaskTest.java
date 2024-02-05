@@ -1,11 +1,15 @@
 package model;
 
 import org.junit.jupiter.api.Test;
+import service.*;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
 
+    HistoryManager historyManager = new InMemoryHistoryManager();
+    TaskManager manager = new InMemoryTaskManager(historyManager);
 
     @Test
     public void shouldTaskBeEqualToTaskIfSameId() {
@@ -23,8 +27,24 @@ class TaskTest {
     }
 
 
-    private static <T extends Task> void assertEqualTask(Task expected, T actual, String message) {
+    private static void assertEqualTask(Task expected, Task actual, String message) {
         assertEquals(expected.getTaskId(), actual.getTaskId(), "id");
     }
+
+    @Test
+    void shouldAddHistory() {
+        Task task = new Task("1 задача", "Описание 1-ой задачи", TaskStatus.NEW);
+
+        historyManager.add(task);
+        final List<Task> history = historyManager.getHistory();
+
+        assertNotNull(history, "Список последних 10-ти задач не пустой");
+        assertEquals(1, history.size(), "В списке последних 10-ти задач - 1 задача");
+
+    }
+
+
+
+
 
 }

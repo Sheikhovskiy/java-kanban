@@ -17,6 +17,7 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> historyList = new ArrayList<>(10);
 
     InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
+    private final HistoryManager historyManager;
 
     int idCount = 0;
 
@@ -25,11 +26,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public InMemoryTaskManager(HistoryManager historyMangager) {
-        //this.historyStorage = historyMangager;
-        this.tasks = new HashMap<>();
-        this.epics = new HashMap<>();
-        this.subtasks = new HashMap<>();
-
+        this.historyManager = historyMangager;
     }
 
     @Override
@@ -65,36 +62,28 @@ public class InMemoryTaskManager implements TaskManager {
     }
     @Override
     public Task getTaskPerId(int id) {
-        inMemoryHistoryManager.add(subtasks.get(id));
+
+        if (tasks.get(id) != null) {
+            historyManager.add(subtasks.get(id));
+        }
         return tasks.get(id);
     }
 
     @Override
     public Subtask getSubtaskPerId(int id) {
 
-
-        inMemoryHistoryManager.add(subtasks.get(id));
-/*        if (historyList.size() < 10) {
-            historyList.add(subtasks.get(id));
-        } else if (historyList.size() == 10) {
-
-            for (int i = 0; i < historyList.size(); i++) {
-                if (i == 8) {
-                    historyList.add(historyList.get(i+1));
-
-                } else {
-                    historyList.add(historyList.get(i+1));
-                }
-            }
-
-        }*/
-
+        if (subtasks.get(id) != null) {
+            historyManager.add(subtasks.get(id));
+        }
         return subtasks.get(id);
     }
 
     @Override
     public Epic getEpicPerId(int id) {
-        inMemoryHistoryManager.add(subtasks.get(id));
+
+        if (epics.get(id) != null) {
+            historyManager.add(epics.get(id));
+        }
         return epics.get(id);
     }
     @Override
@@ -111,7 +100,6 @@ public class InMemoryTaskManager implements TaskManager {
         if (savedEpic == null) {
             return subtask;
         }
-        int epicId = savedEpic.getTaskId();
         savedEpic.setSubtasks(subtask);
         subtasks.put(subtask.getTaskId(), subtask);
         calculateStatus(savedEpic);
@@ -143,6 +131,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void subtaskUpdate(Subtask subtask) {
         Subtask saved = subtasks.get(subtask.getTaskId());
+
+        if (!subtasks.containsKey(subtask.getEpicId())) {
+            return;
+        }
 
         if (saved == null) {
             return;

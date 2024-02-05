@@ -1,23 +1,12 @@
-<<<<<<< HEAD
-=======
-import model.Epic;
-import model.Subtask;
-import model.Task;
-import model.TaskStatus;
-import service.InMemoryTaskManager;
 import service.Managers;
 import service.TaskManager;
 
-import java.util.ArrayList;
 
 
->>>>>>> 4c2c45b (Небольшие доработки)
 public class Main {
 
     public static void main(String[] args) {
 
-<<<<<<< HEAD
-=======
         TaskManager taskManager = Managers.getDefaultTaskManager();
 
 
@@ -77,7 +66,6 @@ public class Main {
         inMemoryTaskManager.deleteSubtaskById(subtask1.getTaskId());
         inMemoryTaskManager.deleteEpicById(epic1.getTaskId());*/
 
->>>>>>> 4c2c45b (Небольшие доработки)
 
 
     }
