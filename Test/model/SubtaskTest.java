@@ -1,7 +1,7 @@
 package model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.InMemoryTaskManager;
 import service.Managers;
 import service.TaskManager;
 
@@ -9,27 +9,41 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SubtaskTest {
 
+    TaskManager taskManager = Managers.getDefaultTaskManager();
+
+    private Subtask subtask1;
+    private Subtask subtask2;
+
+
+    @BeforeEach
+    void setUp() {
+        taskManager.deleteAllEpics();
+        taskManager.deleteAllSubtasks();
+        taskManager.deleteAllEpics();
+        subtask1 = new Subtask("Подзадача 1", "Описание 1", TaskStatus.NEW);
+        subtask2 = new Subtask("Подзадача 2", "Описание 2", TaskStatus.NEW);
+    }
+
+
+
     @Test
-    public void shouldNotEpicBeAddableToSubtask() {
-        Epic epic = new Epic("Эпик", "Описание эпика 1", TaskStatus.NEW);
-        Subtask subtask = new Subtask("Сабтаск", "Описание сабтаска 1", TaskStatus.NEW);
-
-        epic.setTaskId(subtask.getTaskId());
-
-
-        //assertEquals();
+    void shouldTwoSubtasksBeEqualsIfSameId() {
+        taskManager.createSubtask(subtask1);
+        taskManager.createSubtask(subtask2);
+        subtask1.setTaskId(1);
+        subtask1.setTaskId(2);
+        assertEquals(subtask1, subtask2, "Две подзадачи должны быть равны друг другу если равен их id.");
     }
 
     @Test
-    public void shouldSubtaskNotBeHisOwnEpic() {
-        TaskManager manager = Managers.getDefaultTaskManager();
-        Epic epic = new Epic("Эпик 1", "Описание эпика 1", TaskStatus.NEW);
-        Subtask subtask = new Subtask("Подзадача 1", "Описание подзадачи 1", TaskStatus.NEW);
-        epic.setTaskId(1);
-        manager.createEpic(epic);
-        subtask.setEpicId(1);
-        manager.createSubtask(subtask);
-        assertNull(subtask, "Подзадача не может быть того же ID что и её эпик");
+    void shouldNotItsOwnIdBeHisEpicId() {
+        subtask1.setTaskId(1);
+        subtask1.setEpicId(subtask1.getTaskId());
+        taskManager.createSubtask(subtask1);
+
+        assertNull(taskManager.getEpicPerId(subtask1.getEpicId()), "Подзадача не может использовать свой id как" +
+                "id своего эпика");
+
     }
 
 }

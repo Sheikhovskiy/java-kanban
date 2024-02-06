@@ -1,23 +1,14 @@
 package service;
-import model.Epic;
-import model.Subtask;
-import model.Task;
-import model.TaskStatus;
 
-import java.util.HashMap;
+import model.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();
-    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
-    public List<Task> historyList = new ArrayList<>(10);
-
-    InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
-    private final HistoryManager historyManager;
+    HistoryManager historyManager = Managers.getDefaultHistory();
 
     int idCount = 0;
 
@@ -25,23 +16,47 @@ public class InMemoryTaskManager implements TaskManager {
         return ++idCount;
     }
 
-    public InMemoryTaskManager(HistoryManager historyMangager) {
-        this.historyManager = historyMangager;
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 
     @Override
-    public List<Task> getHistory() {
-        return historyList;
+    public List<Task> printListOfAllTasks() {
+        List<Task> listOfAllTasks = new ArrayList<>();
+
+        if (!tasks.isEmpty()) {
+            for (Task task : tasks.values()) {
+                listOfAllTasks.add(task);
+            }
+        }
+
+        return listOfAllTasks;
     }
 
-    public HashMap<Integer, Task> printListOfAllTasks() {
-        return tasks;
+
+    @Override
+    public List<Task> printListOfAllSubtasks() {
+        List<Task> listOfAllSubtasks = new ArrayList<>();
+
+        if (!subtasks.isEmpty()) {
+            for (Subtask subtask : subtasks.values()) {
+                listOfAllSubtasks.add(subtask);
+            }
+        }
+
+        return listOfAllSubtasks;
     }
-    public HashMap<Integer, Subtask> printListOfAllSubtasks() {
-        return subtasks;
-    }
-    public HashMap<Integer, Epic> printListOfAllEpic() {
-        return epics;
+    @Override
+    public List<Task> printListOfAllEpics() {
+        List<Task> listOfAllEpics = new ArrayList<>();
+
+        if (!epics.isEmpty()) {
+            for (Epic epic : epics.values()) {
+                listOfAllEpics.add(epic);
+            }
+        }
+        return listOfAllEpics;
     }
 
     @Override
@@ -63,37 +78,44 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskPerId(int id) {
 
-        if (tasks.get(id) != null) {
-            historyManager.add(subtasks.get(id));
+        final Task askedTask = tasks.get(id);
+
+        if (askedTask != null) {
+            historyManager.add(askedTask);
         }
-        return tasks.get(id);
+        return askedTask;
     }
 
     @Override
     public Subtask getSubtaskPerId(int id) {
+        final Subtask askedSubtask = subtasks.get(id);
 
-        if (subtasks.get(id) != null) {
-            historyManager.add(subtasks.get(id));
+        if (askedSubtask != null) {
+            historyManager.add(askedSubtask);
         }
-        return subtasks.get(id);
+        return askedSubtask;
     }
 
     @Override
     public Epic getEpicPerId(int id) {
+        final Epic askedEpic = epics.get(id);
 
-        if (epics.get(id) != null) {
-            historyManager.add(epics.get(id));
+
+        if (askedEpic != null) {
+            historyManager.add(askedEpic);
         }
-        return epics.get(id);
+        return askedEpic;
     }
     @Override
     public Task createTask(Task task) {
+
         task.setTaskId(generateId());
         tasks.put(task.getTaskId(), task);
         return task;
     }
     @Override
     public Subtask createSubtask(Subtask subtask) {
+
         subtask.setTaskId(generateId());
 
         Epic savedEpic = epics.get(subtask.getEpicId());
@@ -107,6 +129,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
     @Override
     public Epic createEpic(Epic epic) {
+
         epic.setTaskId(generateId());
         epics.put(epic.getTaskId(), epic);
         return epic;

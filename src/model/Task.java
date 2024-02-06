@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Objects;
+
 public class Task {
     private String taskName;
     private String taskDescription;
@@ -38,6 +40,16 @@ public class Task {
     public void setTaskId(int id) {
         this.taskId = id;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return taskId == task.taskId ;
+    }
+
+
 
     public int getTaskId() {
         return taskId;

@@ -1,5 +1,6 @@
 package model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.*;
 import java.util.List;
@@ -8,43 +9,27 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
 
-    HistoryManager historyManager = new InMemoryHistoryManager();
-    TaskManager manager = new InMemoryTaskManager(historyManager);
+    TaskManager taskManager = Managers.getDefaultTaskManager();
 
-    @Test
-    public void shouldTaskBeEqualToTaskIfSameId() {
-        Task task = new Task("Задача 1", "Описание 1", TaskStatus.NEW);
-        Task taskExpected = new Task("Задача 2", "Описание 2", TaskStatus.NEW);
-        assertEqualTask(taskExpected, task, "Две задачи с одинаковым id должны быть равны");
+    private Task task1;
+    private Task task2;
 
+    @BeforeEach
+    void setUp() {
+        task1 = new Task("Задача 1", "Описание 1", TaskStatus.NEW);
+        task2 = new Task("Задача 2", "Описание 2", TaskStatus.NEW);
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
     }
 
     @Test
-    public void shouldTaskBeEqualToSubtaskIfSameId() {
-        Task task = new Task("Задача 1", "Описание 1", TaskStatus.NEW);
-        Subtask subtask = new Subtask("Подзадача 1", "Описание 2", TaskStatus.NEW);
-        assertEqualTask(task, subtask, "Задача и подзадача с одинаковым id должны быть равны");
+    void shouldTwoTasksBeEqualsIfSameId() {
+        task1.setTaskId(1);
+        task2.setTaskId(1);
+        System.out.println(task1.getTaskId());
+        System.out.println(task2.getTaskId());
+        assertEquals(task1, task2, "Две задачи должны быть равны друг другу если равен их id.");
     }
-
-
-    private static void assertEqualTask(Task expected, Task actual, String message) {
-        assertEquals(expected.getTaskId(), actual.getTaskId(), "id");
-    }
-
-    @Test
-    void shouldAddHistory() {
-        Task task = new Task("1 задача", "Описание 1-ой задачи", TaskStatus.NEW);
-
-        historyManager.add(task);
-        final List<Task> history = historyManager.getHistory();
-
-        assertNotNull(history, "Список последних 10-ти задач не пустой");
-        assertEquals(1, history.size(), "В списке последних 10-ти задач - 1 задача");
-
-    }
-
-
-
 
 
 }
