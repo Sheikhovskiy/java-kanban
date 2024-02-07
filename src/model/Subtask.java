@@ -33,7 +33,8 @@ public class Subtask extends Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Subtask subtask = (Subtask) o;
-        return epicId == subtask.epicId;
+        return getTaskId() == subtask.getTaskId();
+//        return epicId == subtask.epicId;
     }
 
     @Override

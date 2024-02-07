@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
 
-    TaskManager taskManager = Managers.getDefaultTaskManager();
+    TaskManager taskManager;
 
     private Epic epic1;
     private Subtask subtask1;
@@ -20,6 +20,7 @@ class InMemoryHistoryManagerTest {
 
     @BeforeEach
     void setUp() {
+        taskManager = Managers.getDefaultTaskManager();
 
         epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW);
         subtask1 = new Subtask("Подзадача 1", "Описание 1", TaskStatus.NEW);
@@ -43,5 +44,6 @@ class InMemoryHistoryManagerTest {
                 "все виды задач");
 
     }
+
 
 }

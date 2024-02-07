@@ -2,23 +2,16 @@ package service;
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import model.TaskStatus;
 
 public interface TaskManager {
 
-         HashMap<Integer, Task> tasks = new HashMap<>();
-         HashMap<Integer, Epic> epics = new HashMap<>();
-         HashMap<Integer, Subtask> subtasks = new HashMap<>();
+        List<Task> printListOfAllTasks();
 
-         List<Task> printListOfAllTasks();
+        List<Task> printListOfAllSubtasks();
 
-         List<Task> printListOfAllSubtasks();
-
-         List<Task> printListOfAllEpics();
+        List<Task> printListOfAllEpics();
         void deleteAllTasks();
         void deleteAllSubtasks();
         void deleteAllEpics();

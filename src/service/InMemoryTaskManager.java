@@ -3,10 +3,22 @@ package service;
 import model.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
 
+
+
+    private final HashMap<Integer, Task> tasks;
+    private final HashMap<Integer, Subtask> subtasks;
+    private final HashMap<Integer, Epic> epics;
+
+    InMemoryTaskManager() {
+        this.tasks = new HashMap<>();
+        this.subtasks = new HashMap<>();
+        this.epics = new HashMap<>();
+    }
 
     HistoryManager historyManager = Managers.getDefaultHistory();
 
@@ -155,7 +167,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void subtaskUpdate(Subtask subtask) {
         Subtask saved = subtasks.get(subtask.getTaskId());
 
-        if (!subtasks.containsKey(subtask.getEpicId())) {
+//        if (!subtasks.containsKey(subtask.getEpicId())) {
+        if (!subtasks.containsKey(subtask.getTaskId())) {
             return;
         }
 
@@ -245,7 +258,7 @@ public class InMemoryTaskManager implements TaskManager {
 
             } else if (subtasks.get(subId).getStatus().equals(TaskStatus.IN_PROGRESS)) {
                 countInProgress++;
-                if (countInProgress == listLength){
+                if (countInProgress == listLength || countInProgress >= 1) {
                     epic.setStatus(TaskStatus.IN_PROGRESS);
                 }
 
