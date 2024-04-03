@@ -9,24 +9,6 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-
-/*    LinkedList<Task> history = new LinkedList<>();
-    @Override
-    public void add(Task task) {
-
-        if (history.size() > 9) {
-            history.removeFirst();
-        }
-        history.add(task);
-
-    }*/
-//    @Override
-//    public LinkedList<Task> getHistory() {
-//        return history;
-//    }
-
-
-
     private static class Node {
 
         Task item;
