@@ -195,15 +195,13 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-//        if (historyManager.getHistory().size() > 0 ){
-//            historyManager.remove(tasks.get(taskId));
-//
-//        }
-        historyManager.remove(taskId);
         tasks.remove(taskId);
+        historyManager.remove(taskId);
     }
     @Override
     public void deleteSubtaskById(int subtaskId) {
+
+        System.out.println(subtasks);
         if (!subtasks.containsKey(subtaskId)) {
             System.out.println("Такого id не существует");
             return;
@@ -215,12 +213,9 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(subtask.getEpicId());
 
         epic.getSubtasks().remove(Integer.valueOf(subtaskId));
-        subtasks.remove(subtaskId);
 
-
-//        if (historyManager.getHistory().size() > 0) {
-//            historyManager.remove(subtask);
-//        }
+        //subtasks.remove(subtaskId);
+        historyManager.remove(subtaskId);
 
         calculateStatus(epic);
 
@@ -236,11 +231,8 @@ public class InMemoryTaskManager implements TaskManager {
             subtasks.remove(subId);
         }
 
-//        if (historyManager.getHistory().size() > 0) {
-//            historyManager.remove(epic);
-//        }
-
         epics.remove(epicId);
+        historyManager.remove(epicId);
 
     }
     @Override

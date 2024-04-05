@@ -56,7 +56,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldBePossibleToDeleteTaskPerId() {
+        void shouldBePossibleToDeleteTaskPerId() {
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 
@@ -252,6 +252,43 @@ class InMemoryTaskManagerTest {
         taskManager.getTaskPerId(taskTested);
 
         taskManager.deleteTaskById(taskTested);
+
+
+        assertEquals(1, taskManager.getHistory().size());
+    }
+
+    @Test
+    void shouldDeleteSubtaskFromHistoryListWhenSubtaskDeleted() {
+        taskManager.createEpic(epic1);
+        subtask2.setEpicId(epic1.getTaskId());
+
+        taskManager.createSubtask(subtask1);
+        taskManager.createSubtask(subtask2);
+
+        int taskTested = subtask2.getTaskId();
+
+        taskManager.getSubtaskPerId(subtask1.getTaskId());
+        taskManager.getSubtaskPerId(taskTested);
+
+        taskManager.deleteSubtaskById(taskTested);
+
+
+        assertEquals(1, taskManager.getHistory().size());
+    }
+
+
+    @Test
+    void shouldDeleteEpicFromHistoryListWhenEpicDeleted() {
+        taskManager.createEpic(epic1);
+        taskManager.createEpic(epic2);
+
+        int taskTested = epic1.getTaskId();
+
+        taskManager.getEpicPerId(epic2.getTaskId());
+        taskManager.getEpicPerId(taskTested);
+
+        taskManager.deleteEpicById(taskTested);
+
 
         assertEquals(1, taskManager.getHistory().size());
     }
