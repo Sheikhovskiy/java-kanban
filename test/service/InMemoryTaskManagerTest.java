@@ -240,4 +240,20 @@ class InMemoryTaskManagerTest {
 
     }
 
+
+    @Test
+    void shouldDeleteTaskFromHistoryListWhenTaskDeleted() {
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+
+        int taskTested = task1.getTaskId();
+
+        taskManager.getTaskPerId(task2.getTaskId());
+        taskManager.getTaskPerId(taskTested);
+
+        taskManager.deleteTaskById(taskTested);
+
+        assertEquals(1, taskManager.getHistory().size());
+    }
+
 }

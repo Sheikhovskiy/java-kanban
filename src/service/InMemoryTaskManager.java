@@ -123,6 +123,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         task.setTaskId(generateId());
         tasks.put(task.getTaskId(), task);
+
         return task;
     }
     @Override
@@ -167,7 +168,6 @@ public class InMemoryTaskManager implements TaskManager {
     public void subtaskUpdate(Subtask subtask) {
         Subtask saved = subtasks.get(subtask.getTaskId());
 
-//        if (!subtasks.containsKey(subtask.getEpicId())) {
         if (!subtasks.containsKey(subtask.getTaskId())) {
             return;
         }
@@ -194,6 +194,12 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Такого id не существует");
             return;
         }
+
+//        if (historyManager.getHistory().size() > 0 ){
+//            historyManager.remove(tasks.get(taskId));
+//
+//        }
+        historyManager.remove(taskId);
         tasks.remove(taskId);
     }
     @Override
@@ -211,6 +217,11 @@ public class InMemoryTaskManager implements TaskManager {
         epic.getSubtasks().remove(Integer.valueOf(subtaskId));
         subtasks.remove(subtaskId);
 
+
+//        if (historyManager.getHistory().size() > 0) {
+//            historyManager.remove(subtask);
+//        }
+
         calculateStatus(epic);
 
     }
@@ -224,6 +235,10 @@ public class InMemoryTaskManager implements TaskManager {
         for (Integer subId : epic.getSubtasks()) {
             subtasks.remove(subId);
         }
+
+//        if (historyManager.getHistory().size() > 0) {
+//            historyManager.remove(epic);
+//        }
 
         epics.remove(epicId);
 

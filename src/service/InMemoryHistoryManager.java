@@ -18,7 +18,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void add(Task task) {
         Node node = history.get(task.getTaskId());
-
+        //removeNode(node);
         linkLast(task);
 
     }
@@ -38,9 +38,10 @@ public class InMemoryHistoryManager implements HistoryManager {
 
 
     @Override
-    public void remove(Task task) {
-        Node node = history.get(task);
-        removeNode(node);
+    public void remove(int id) {
+        Node node = history.get(id);
+        history.remove(node.item.getTaskId());
+
     }
 
 
@@ -60,7 +61,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void removeNode(Node node) {
-
         history.remove(node.item.getTaskId());
     }
 
