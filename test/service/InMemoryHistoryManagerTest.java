@@ -16,6 +16,7 @@ class InMemoryHistoryManagerTest {
     private Epic epic1;
     private Subtask subtask1;
     private Task task1;
+    private Task task2;
 
 
     @BeforeEach
@@ -25,6 +26,7 @@ class InMemoryHistoryManagerTest {
         epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW);
         subtask1 = new Subtask("Подзадача 1", "Описание 1", TaskStatus.NEW);
         task1 = new Task("Задача 1", "Описание 1", TaskStatus.IN_PROGRESS);
+        task2 = new Task("Задача 2", "Описание 2", TaskStatus.IN_PROGRESS);
     }
 
     @Test
@@ -40,7 +42,13 @@ class InMemoryHistoryManagerTest {
         taskManager.getSubtaskPerId(subtask1.getTaskId());
         taskManager.getTaskPerId(task1.getTaskId());
 
-        assertEquals(taskManager.getHistory().size(), 3, "В истории задач, должны сохранятся " +
+        taskManager.createTask(task2);
+        taskManager.getTaskPerId(task2.getTaskId());
+
+
+
+
+        assertEquals(taskManager.getHistory().size(), 4, "В истории задач, должны сохранятся " +
                 "все виды задач");
 
     }
