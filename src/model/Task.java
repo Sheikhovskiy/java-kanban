@@ -25,6 +25,11 @@ public class Task {
 
     }
 
+
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
     public String getTaskName() { return taskName; }
 
     public void setTaskName(String taskName) { this.taskName = taskName; }
