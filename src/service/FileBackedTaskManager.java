@@ -1,9 +1,7 @@
 package service;
 
-import model.Epic;
-import model.Subtask;
-import model.Task;
-import model.TaskStatus;
+import model.*;
+
 import java.util.*;
 
 import java.util.List;
@@ -13,31 +11,65 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     public void save() {
 
 
+    }
 
-
+    public static FileBackedTaskManager loadFromFile(File file) {
 
     }
 
-    //new Task("Задача 2", "Описание 2",TaskStatus.IN_PROGRESS);
+
 
     String toString(Task task) {
 
-        //if (task.getClass().equals(Task))
+        String result =
+                String.valueOf(task.getTaskId()) + ","
+                + task.getType() + ","
+                + task.getTaskName() + ","
+                + task.getStatus() + ","
+                + task.getTaskDescription() + ",";
 
-        return String.valueOf(task.getTaskId())
-                + task.getClass()
-                + task.getStatus()
-                + task.getTaskDescription();
-                // + task.getEpic();
+                if (task.getType() == TaskType.SUBTASK){
+                    result +=  getSubtaskPerId(task.getTaskId()).getEpicId();
+                } else {
+                    result += "null";
+                }
+        return result;
 
     }
 
 
-/*    Task fromString(String value) {
+    Task fromString(String value) {
         StringBuilder stringBuilder = new StringBuilder(100);
 
+        String[] receivedStr = value.split(",");
 
-    }*/
+        Task task = null;
+        TaskType type = TaskType.valueOf(receivedStr[1]);
+
+
+        switch (type) {
+
+            case TASK:
+                task = new Task(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]));
+                task.setTaskId(Integer.valueOf(receivedStr[0]));
+                break;
+
+
+            case SUBTASK:
+                task = new Subtask(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]));
+                task.setTaskId(Integer.valueOf(receivedStr[0]));
+                ((Subtask) task).setEpicId(Integer.valueOf(receivedStr[5]));
+                break;
+
+            case EPIC:
+                task = new Epic(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]));
+                task.setTaskId(Integer.valueOf(receivedStr[0]));
+                break;
+
+        }
+        return task;
+
+    }
 
 
 
