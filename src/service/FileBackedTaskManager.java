@@ -2,20 +2,26 @@ package service;
 
 import model.*;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
 
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
 
-    public void save() {
+    public void save() throws IOException {
 
+        Writer fileWriter = new FileWriter("Saved_Data.txt", true);
+//        fileWriter.write(task);
+        fileWriter.close();
 
     }
 
-    public static FileBackedTaskManager loadFromFile(File file) {
-
-    }
+//    public static FileBackedTaskManager loadFromFile(File file) {
+//
+//    }
 
 
 
@@ -54,7 +60,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 task.setTaskId(Integer.valueOf(receivedStr[0]));
                 break;
 
-
             case SUBTASK:
                 task = new Subtask(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]));
                 task.setTaskId(Integer.valueOf(receivedStr[0]));
@@ -68,7 +73,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
         }
         return task;
-
     }
 
 

@@ -120,8 +120,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
     @Override
     public Task createTask(Task task) {
+        if (task.getTaskId() == null) {
+            task.setTaskId(generateId());
+        }
 
-        task.setTaskId(generateId());
         tasks.put(task.getTaskId(), task);
 
         return task;
