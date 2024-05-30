@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,12 +18,16 @@ class FileBackedTaskManagerTest {
 
 
     FileBackedTaskManager fileBackedTaskManager;
+    FileBackedTaskManager fileBackedTaskManagerWithFile;
     TaskManager taskManager;
+
+    File tempFile;
 
     private Epic epic1;
     private Subtask subtask1;
     private Task task1;
     private Task task2;
+    private Task task3;
 
 
     @BeforeEach
@@ -32,27 +35,34 @@ class FileBackedTaskManagerTest {
         fileBackedTaskManager = Managers.getDefaultFileBackedManager();
         taskManager = Managers.getDefaultTaskManager();
 
+        try {
+            tempFile = File.createTempFile("Temp_File", ".csv");
+            fileBackedTaskManagerWithFile = new FileBackedTaskManager(tempFile);
+
+        } catch (IOException exception){
+            System.out.println(exception.getMessage());
+        }
+
         epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW);
         subtask1 = new Subtask("Подзадача 1", "Описание 1", TaskStatus.NEW);
         task1 = new Task("Задача 1", "Описание 1", TaskStatus.IN_PROGRESS);
         task2 = new Task("Задача 2", "Описание 2", TaskStatus.IN_PROGRESS);
+        task3 = new Task("Задача 3", "Описание 3", TaskStatus.IN_PROGRESS);
     }
 
 
-/*    В первую очередь проверьте новые методы FileBackedTaskManager:
-    сохранение и загрузку пустого файла;
-    сохранение нескольких задач;
-    загрузку нескольких задач.*/
 
     @Test
     void shouldFileBeEmpty() {
 
         try {
-            File tempFile = File.createTempFile("Temp_File", ".csv");
 
 
-            fileBackedTaskManager.createTask(task1);
-            fileBackedTaskManager.createTask(task2);
+            fileBackedTaskManagerWithFile.createTask(task1);
+            fileBackedTaskManagerWithFile.createTask(task2);
+
+            FileBackedTaskManager.loadFromFile(tempFile);
+
 
             assertEquals(0, Files.size(Path.of(tempFile.toURI())));
 
@@ -64,43 +74,43 @@ class FileBackedTaskManagerTest {
     }
 
 
-//    @Test
-//    void shouldSaveMultipleTasks() {
-//
-//        try {
-//            File tempFile = File.createTempFile("Temp_File", ".csv");
-//
-//
-//            fileBackedTaskManager.createTask(task1);
-//            fileBackedTaskManager.createTask(task2);
-//
-//            fileBackedTaskManager.getTaskPerId(task1.getTaskId());
-//            fileBackedTaskManager.getTaskPerId(task2.getTaskId());
-//
-//            fileBackedTaskManager.deleteTaskById(task1.getTaskId());
-//
-//            assertEquals(0, Files.size(Path.of(tempFile.toURI())));
-//
-//
-//        } catch (IOException exception) {
-//            exception.printStackTrace();
-//        }
-//
-//    }
+    @Test
+    void shouldSaveMultipleTasks() {
 
 
+        fileBackedTaskManagerWithFile.createTask(task1);
+        fileBackedTaskManagerWithFile.createTask(task2);
+
+        fileBackedTaskManagerWithFile.getTaskPerId(task1.getTaskId());
+        fileBackedTaskManagerWithFile.getTaskPerId(task2.getTaskId());
+
+        fileBackedTaskManagerWithFile.deleteTaskById(task1.getTaskId());
+
+        assertEquals(1, fileBackedTaskManagerWithFile.tasks.size());
 
 
+    }
 
 
-//    @Test
-//    void shouldLoadMultipleTasks() {
-//
-//
-//
-//
-//    }
+    @Test
+    void shouldLoadMultipleTasks() {
 
+        fileBackedTaskManagerWithFile.createTask(task1);
+        fileBackedTaskManagerWithFile.createTask(task2);
+        fileBackedTaskManagerWithFile.createTask(task3);
+        fileBackedTaskManagerWithFile.createEpic(epic1);
+
+        fileBackedTaskManagerWithFile.getTaskPerId(task1.getTaskId());
+        fileBackedTaskManagerWithFile.getTaskPerId(task2.getTaskId());
+        fileBackedTaskManagerWithFile.getTaskPerId(task3.getTaskId());
+        fileBackedTaskManagerWithFile.getEpicPerId(epic1.getTaskId());
+
+        fileBackedTaskManagerWithFile.deleteEpicById(epic1.getTaskId());
+
+        FileBackedTaskManager.loadFromFile(tempFile);
+
+        assertEquals(3, fileBackedTaskManagerWithFile.tasks.size() + fileBackedTaskManager.epics.size());
+    }
 
 
 
