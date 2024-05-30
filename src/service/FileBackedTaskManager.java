@@ -1,6 +1,7 @@
 package service;
 
 import model.*;
+import org.w3c.dom.Node;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,13 +12,27 @@ import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
 
-    public void save() throws IOException {
+    public void save() {
+        // Создать файл
+        // Проверка на существующий файл
 
-        Writer fileWriter = new FileWriter("Saved_Data.txt", true);
-//        fileWriter.write(task);
-        fileWriter.close();
+        try (Writer fileWriter = new FileWriter("Saved_Data.csv", true)) {
 
-    }
+            List<Task> historyList = getHistory();
+
+            for (Task task : historyList) {
+                fileWriter.write(toString(task));
+            }
+
+    } catch (IOException exception) {
+            exception.getMessage();
+        }
+
+
+}
+
+
+
 
 //    public static FileBackedTaskManager loadFromFile(File file) {
 //
