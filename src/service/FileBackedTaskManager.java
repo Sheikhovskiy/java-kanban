@@ -1,14 +1,15 @@
 package service;
 import model.*;
 import java.io.*;
+import OwnExceptions.ManagerSaveException;
 
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
 
-    FileBackedTaskManager() {
+    public FileBackedTaskManager() {
 
     }
-    FileBackedTaskManager(File csvFile) {
+    public FileBackedTaskManager(File csvFile) {
         this.dataFile = csvFile;
     }
 
@@ -16,43 +17,33 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     public void save() {
 
-        try (Writer fileWriter = new FileWriter(dataFile)) {
+        try (FileWriter fileWriter = new FileWriter(dataFile);
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
             for (Task task : tasks.values()) {
-                fileWriter.write(toString(task));
+                bufferedWriter.write(toString(task));
+//                bufferedWriter.newLine();
             }
 
             for (Subtask subtask : subtasks.values()) {
-                fileWriter.write(toString(subtask));
+                bufferedWriter.write(toString(subtask));
             }
 
             for (Epic epic : epics.values()) {
-                fileWriter.write(toString(epic));
+                bufferedWriter.write(toString(epic));
             }
 
 
-    } catch (IOException exception1) {
-
-            try {
-                throw new ManagerSaveException("Произошла ошибка при сохранение файлов.");
-
-            } catch (ManagerSaveException exception2) {
-                throw new RuntimeException(exception2);
-            }
+    } catch (IOException exception) {
+            throw new ManagerSaveException("Произошла ошибка при сохранение файлов.");
         }
 
 }
 
-    class ManagerSaveException extends Exception {
-
-        public ManagerSaveException(String message) {
-            super(message);
-        }
-    }
 
     public static FileBackedTaskManager loadFromFile(File inputFile) {
 
-        FileBackedTaskManager fileBackedTaskManagerForLoad = new FileBackedTaskManager(inputFile);
+        final FileBackedTaskManager fileBackedTaskManagerForLoad = new FileBackedTaskManager(inputFile);
 
         try (FileReader reader = new FileReader(fileBackedTaskManagerForLoad.dataFile);
              BufferedReader bufferedReader = new BufferedReader(reader)) {
@@ -82,7 +73,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             fileBackedTaskManagerForLoad.idCount = maxId;
 
         } catch (IOException exception) {
-            System.out.println("Произошла ошибка" + exception.getMessage());
+            throw new ManagerSaveException("Произошла ошибка при чтении файлов.");
         }
 
         return fileBackedTaskManagerForLoad;
@@ -115,19 +106,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         switch (type) {
 
             case TASK:
-                task = new Task(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]));
-                task.setTaskId(Integer.valueOf(receivedStr[0]));
+                task = new Task(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]));
                 break;
 
             case SUBTASK:
-                task = new Subtask(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]));
-                task.setTaskId(Integer.valueOf(receivedStr[0]));
+                task = new Subtask(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]));
                 ((Subtask) task).setEpicId(Integer.valueOf(receivedStr[5]));
                 break;
 
             case EPIC:
-                task = new Epic(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]));
-                task.setTaskId(Integer.valueOf(receivedStr[0]));
+                task = new Epic(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]));
                 break;
 
         }
