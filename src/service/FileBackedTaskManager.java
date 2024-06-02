@@ -2,8 +2,6 @@ package service;
 import model.*;
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 import OwnExceptions.ManagerSaveException;
@@ -43,7 +41,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             bufferedWriter.newLine();
 
             for (Task historyTask : getHistory()) {
-//                bufferedWriter.write(Integer.toString(historyTask.getTaskId()) + ",");
                 bufferedWriter.write(String.format("%s ", Integer.valueOf(historyTask.getTaskId())));
 
             }
@@ -61,33 +58,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         int maxId = 0;
 
         try  {
+
             String content = Files.readString(inputFile.toPath());
+            if (Objects.equals(content, "")) return loadedTaskManager;
+
             String[] lines = content.split(System.lineSeparator());
-//            System.out.println(content);
-//            System.out.println(fromString(lines[0]));
 
             List<Integer> historyRecovered = new ArrayList<>();
 
-            // 1
             for (int i = 0; i < lines.length; i++) {
 
+
+
                 String line = lines[i];
-//                System.out.println(line);
+
                 if (line.isEmpty()) {
-                    String historyString = String.valueOf(lines[i + 1]);
-//                    System.out.println(historyString);
+                    String historyString = lines[i + 1];
                     String[] historyId = historyString.split(" ");
 
                     for (String id : historyId) {
                         historyRecovered.add(Integer.valueOf(id));
                     }
-//                    System.out.println(historyRecovered);
-
-//                    historyRecovered.add(Integer.valueOf(lines[i + 1]));
                     break;
                 }
 
-//                System.out.println(lines[i]);
                 Task taskRecovered = fromString(lines[i]);
 
 
@@ -137,8 +131,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                     }
 
                 }
-
-
 
             loadedTaskManager.idCount = maxId;
 

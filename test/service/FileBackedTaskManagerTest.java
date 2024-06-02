@@ -55,21 +55,13 @@ class FileBackedTaskManagerTest {
     @Test
     void shouldFileBeEmpty() {
 
-        try {
 
+        fileBackedTaskManagerWithFile.createTask(task1);
+        fileBackedTaskManagerWithFile.createTask(task2);
 
-            fileBackedTaskManagerWithFile.createTask(task1);
-            fileBackedTaskManagerWithFile.createTask(task2);
+        FileBackedTaskManager.loadFromFile(tempFile);
+        assertEquals(0, tempFile.length());
 
-            FileBackedTaskManager.loadFromFile(tempFile);
-
-
-            assertEquals(0, Files.size(Path.of(tempFile.toURI())));
-
-
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
 
     }
 

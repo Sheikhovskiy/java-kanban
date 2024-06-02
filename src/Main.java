@@ -10,6 +10,7 @@ public class Main {
 
     public static void main(String[] args) {
 
+/*
         File testedFile = new File("Saved_data.csv");
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(testedFile);
 
@@ -28,7 +29,7 @@ public class Main {
         fileBackedTaskManager.createTask(task3);
 
         fileBackedTaskManager.getTaskPerId(task1.getTaskId());
-//        fileBackedTaskManager.getTaskPerId(task2.getTaskId());
+        fileBackedTaskManager.getTaskPerId(task2.getTaskId());
 
 
         fileBackedTaskManager.deleteTaskById(task3.getTaskId());
@@ -37,6 +38,7 @@ public class Main {
         FileBackedTaskManager loadedFileTaskManager = FileBackedTaskManager.loadFromFile(testedFile);
         System.out.println(loadedFileTaskManager.printListOfAllTasks());
         System.out.println(loadedFileTaskManager.getHistory());
+*/
 
 
     }
