@@ -70,41 +70,32 @@ public class InMemoryHistoryManager implements HistoryManager {
             return;
         }
 
-        Node next = node.next;
-        Node prev = node.prev;
+        Node nextNode = node.next;
+        Node prevNode = node.prev;
 
-        if (prev == null) {
-            first = next;
+        if (prevNode == null) {
+            first = nextNode;
         } else {
-            prev.next = next;
+            prevNode.next = nextNode;
             node.prev = null;
+
         }
 
-        if (next == null) {
-            last = prev;
+        if (nextNode == null) {
+            last = prevNode;
         } else {
-            next.prev = prev;
+            nextNode.prev = prevNode;
             node.next = null;
         }
 
         history.remove(node.item.getTaskId());
         node.item = null;
-
-
-
-
-
-
     }
-
-
     private static class Node {
 
         Task item;
         Node next;
         Node prev;
-
-
         Node(Node prev, Task element, Node next) {
 
             this.item = element;
