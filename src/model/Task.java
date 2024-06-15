@@ -118,6 +118,8 @@ public class Task {
                 " ,taskDescription='" + taskDescription + '\'' +
                 " ,status='" + status + '\'' +
                 " ,taskId=" + taskId +
+                " ,taskDuration=" + duration +
+                " ,taskStartTime=" + startTime +
                 '}';
     }
 

@@ -36,6 +36,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             }
 
             for (Epic epic : epics.values()) {
+                System.out.println(epic);
                 bufferedWriter.write(toString(epic));
                 bufferedWriter.newLine();
             }
@@ -71,7 +72,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             for (int i = 0; i < lines.length; i++) {
 
 
-
                 String line = lines[i];
 
                 if (line.isEmpty()) {
@@ -103,11 +103,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                         loadedTaskManager.subtasks.put(idRecovered, (Subtask) taskRecovered);
                         break;
                     case EPIC:
+                        //System.out.println(loadedTaskManager.printListOfAllEpics());
                         loadedTaskManager.epics.put(idRecovered, (Epic) taskRecovered);
                         break;
 
                 }
-
+            }
 
                 for (Map.Entry<Integer, Subtask> entry : loadedTaskManager.subtasks.entrySet()) {
                     Subtask subtask = entry.getValue();
@@ -117,7 +118,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
                 }
 
-            }
+            //}
                 for (Integer taskId : historyRecovered) {
 
                     Task task = loadedTaskManager.tasks.get(taskId);
@@ -183,16 +184,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         switch (type) {
 
             case TASK:
-                task = new Task(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.valueOf(receivedStr[6]));
+                task = new Task(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
                 break;
 
             case SUBTASK:
-                task = new Subtask(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.valueOf(receivedStr[6]));
+                task = new Subtask(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
                 ((Subtask) task).setEpicId(Integer.valueOf(receivedStr[5]));
                 break;
 
             case EPIC:
-                task = new Epic(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.valueOf(receivedStr[6]));
+                task = new Epic(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
                 break;
 
         }

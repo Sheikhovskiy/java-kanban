@@ -38,13 +38,9 @@ public class Epic extends Task {
         return subtasksId;
     }
 
-    public void setSubtasks(Subtask subtask) {
+/*    public void setSubtasks(Subtask subtask) {
 
         this.subtasksId.add(subtask.getTaskId());
-
-    }
-
-    public void addTask(Subtask subtask) {
 
         Duration durationTemp;
 
@@ -63,20 +59,30 @@ public class Epic extends Task {
             this.duration += (int) durationTemp.toMinutes();
         }
 
+    }*/
+
+    public void setSubtasks(Subtask subtask) {
+
+        this.subtasksId.add(subtask.getTaskId());
+
+        int durationTemp = 0;
+
+        if (subtask.getStartTime().isBefore(startTime)) {
+            this.startTime = subtask.getStartTime();
+        }
+
+        if (subtask.getEndTime().isAfter(endTime)) {
+            this.endTime = subtask.getEndTime();
+
+        }
+
+        durationTemp = subtask.getDuration();
+        duration += durationTemp;
+
+
+
     }
 
-
-
-//    public void removeTask(Subtask subtask) {
-//
-//        if (!subtasksId.contains(subtask.getTaskId())) {
-//
-//            return;
-//        }
-//
-//        subtasksId.remove(subtask);
-//
-//    }
 
 
     @Override
@@ -104,19 +110,10 @@ public class Epic extends Task {
         return Objects.equals(subtasksId, epic.subtasksId);
     }
 
-//    public void setStartTime(int startTime) {
-//        this.startTime = startTime;
-//    }
-//
-//
-//    public void setEndTime(int endTime) {
-//        this.endTime = endTime;
-//    }
 
 
     public Instant getEndTime() {
         return this.endTime;
     }
-
 
 }

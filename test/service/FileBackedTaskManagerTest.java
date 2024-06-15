@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,13 +20,6 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
     FileBackedTaskManager fileBackedTaskManagerWithFile;
 
     File tempFile;
-
-    private Epic epic1;
-    private Subtask subtask1;
-    private Task task1;
-    private Task task2;
-    private Task task3;
-
 
     @Override
     protected TaskManager createTaskmanager() {
@@ -111,6 +105,49 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
     @Test
     void shouldLoadTaskWithDurationAndStartTime() {
 
+        taskInstant1 = new Task("Временная задача", "Описание В. задачи", TaskStatus.NEW, 11, Instant.now().plusSeconds(10), 3 );
+        taskInstant2 = new Task("Временная задача 2", "Описание В. задачи 2", TaskStatus.NEW, 12, Instant.now().plusSeconds(500), 7 );
+
+
+        fileBackedTaskManagerWithFile.createTask(taskInstant1);
+        fileBackedTaskManagerWithFile.createTask(taskInstant2);
+
+/*        fileBackedTaskManagerWithFile.getTaskPerId(taskInstant1.getTaskId());
+        fileBackedTaskManagerWithFile.getTaskPerId(taskInstant2.getTaskId());*/
+
+        fileBackedTaskManagerWithFile.deleteTaskById(taskInstant2.getTaskId());
+
+
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+
+        assertEquals(1, loadedManager.printListOfAllTasks().size());
+
+
+    }
+
+
+    @Test
+    void shouldLoadSubtaskWithDurationAndStartTime() {
+
+
+        epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW, 1);
+        fileBackedTaskManagerWithFile.createEpic(epic1);
+
+
+        subtaskInstant1 = new Subtask("Временная Подзадача", "Описание В. задачи", TaskStatus.NEW,  Instant.now().plusSeconds(10), 3 );
+        subtaskInstant2 = new Subtask("Временная Подзадача 2", "Описание В. задачи 2", TaskStatus.NEW,  Instant.now().plusSeconds(500), 7 );
+        subtaskInstant1.setEpicId(epic1.getTaskId());
+        subtaskInstant2.setEpicId(epic1.getTaskId());
+
+
+        fileBackedTaskManagerWithFile.createSubtask(subtaskInstant1);
+        fileBackedTaskManagerWithFile.createSubtask(subtaskInstant2);
+
+        fileBackedTaskManagerWithFile.save();
+
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+
+        assertEquals(2, loadedManager.printListOfAllSubtasks().size());
 
     }
 

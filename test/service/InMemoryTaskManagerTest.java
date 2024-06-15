@@ -7,18 +7,13 @@ import model.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InMemoryTaskManagerTest extends TaskManagerTest {
 
 
-    TaskManager taskManager;
-    private Epic epic1;
-    private Epic epic2;
-    private Subtask subtask1;
-    private Subtask subtask2;
-    private Task task1;
-    private Task task2;
 
     @Override
     protected TaskManager createTaskmanager() {
@@ -322,8 +317,57 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
     @Test
     void shouldReturnPrioritizedTasks() {
 
+        taskInstant1 = new Task("Временная задача", "Описание В. задачи", TaskStatus.NEW, 11, Instant.now().plusSeconds(10), 3 );
+        taskInstant2 = new Task("Временная задача 2", "Описание В. задачи 2", TaskStatus.NEW, 12, Instant.now().plusSeconds(500), 7 );
+
+        taskManager.createTask(taskInstant1);
+        taskManager.createTask(taskInstant2);
+
+/*        taskManager.taskUpdate(taskInstant1);
+        taskManager.taskUpdate(taskInstant2);*/
+//        taskManager.getPrioritizedTasks();
 
 
+        assertEquals(2, taskManager.getPrioritizedTasks().size());
+
+    }
+
+    @Test
+    void shouldReturnPrioritizedSubtask() {
+
+        subtaskInstant1 = new Subtask("Временная Подзадача", "Описание В. задачи", TaskStatus.NEW,  Instant.now().plusSeconds(10), 3 );
+        subtaskInstant2 = new Subtask("Временная Подзадача 2", "Описание В. задачи 2", TaskStatus.NEW,  Instant.now().plusSeconds(500), 7 );
+
+        subtaskInstant1.setEpicId(epic1.getTaskId());
+        subtaskInstant2.setEpicId(epic1.getTaskId());
+
+        taskManager.createEpic(epic1);
+
+        taskManager.createSubtask(subtaskInstant1);
+        taskManager.createSubtask(subtaskInstant2);
+
+
+        assertEquals(2, taskManager.getPrioritizedTasks().size());
+
+    }
+
+
+    @Test
+    void shouldEpicBeTheSumOfItsSubtasksDuration() {
+
+
+        subtaskInstant1 = new Subtask("Временная Подзадача", "Описание В. задачи", TaskStatus.NEW,  Instant.now().plusSeconds(10), 3 );
+        subtaskInstant2 = new Subtask("Временная Подзадача 2", "Описание В. задачи 2", TaskStatus.NEW,  Instant.now().plusSeconds(500), 7 );
+
+        subtaskInstant1.setEpicId(epic1.getTaskId());
+        subtaskInstant2.setEpicId(epic1.getTaskId());
+
+        taskManager.createEpic(epic1);
+
+        taskManager.createSubtask(subtaskInstant1);
+        taskManager.createSubtask(subtaskInstant2);
+
+        assertEquals(10, epic1.getDuration());
 
     }
 

@@ -4,6 +4,7 @@ import OwnExceptions.NotFoundException;
 import model.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -28,7 +29,63 @@ public class InMemoryTaskManager implements TaskManager {
         return ++idCount;
     }
 
+    @Override
+    public Task createTask(Task task) {
 
+        Task initial = tasks.get(task.getTaskId());
+
+        if (initial != null) {
+            System.out.println("Задача Task id=" + task.getTaskId() + "Уже существует");
+            return task;
+        }
+
+        if (checkTaskTime(task) ) {
+            throw new IllegalStateException("Задача пересекается с уже существующей");
+        }
+
+        task.setTaskId(generateId());
+        tasks.put(task.getTaskId(), task);
+
+        if (!(task.getStartTime().equals(task.getEndTime()))) { // Проверка что duration != 0, т.к Instant мы по дефолту обозначаем Instant.now();
+            prioritizedTasks.add(task);
+        }
+
+
+        return task;
+    }
+
+    @Override
+    public Subtask createSubtask(Subtask subtask) {
+
+        subtask.setTaskId(generateId());
+
+        Epic savedEpic = epics.get(subtask.getEpicId());
+        if (savedEpic == null) {
+            return subtask;
+        }
+
+        Subtask initial = subtasks.get(subtask.getTaskId());
+
+        if (initial != null) {
+            System.out.println("Задача Subtask id=" + subtask.getTaskId() + "Уже существует");
+            return subtask;
+        }
+
+        if (checkTaskTime(subtask)) {
+            throw new IllegalStateException("Задача пересекается с уже существующей");
+        }
+
+        savedEpic.setSubtasks(subtask);
+        subtasks.put(subtask.getTaskId(), subtask);
+        calculateStatus(savedEpic);
+
+        if (!(subtask.getStartTime().equals(subtask.getEndTime()))) {
+            prioritizedTasks.add(subtask);
+        }
+
+
+        return subtask;
+    }
 
     @Override
     public void taskUpdate(Task task) {
@@ -39,9 +96,9 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NotFoundException("Task id=" + task.getTaskId());
         }
 
-        if (checkTaskTime(task) ) {
+        if (!checkTaskTime(task) ) {
             prioritizedTasks.remove(initial);
-            prioritizedTasks.add(task);
+            add(task);
         }
 //        prioritizedTasks.remove(initial);
 //        prioritizedTasks.add(task);
@@ -50,25 +107,84 @@ public class InMemoryTaskManager implements TaskManager {
         tasks.put(task.getTaskId(), task);
     }
 
+
+    public void add(Task task) {
+
+        if (prioritizedTasks.stream().anyMatch( existingTask -> checkTaskTime(task))) {
+            throw new IllegalStateException("Задачи пересекаются");
+        } else {
+            prioritizedTasks.add(task);
+        }
+
+    }
+
+    @Override
+    public void subtaskUpdate(Subtask subtask) {
+        Subtask initial = subtasks.get(subtask.getTaskId());
+
+
+
+        if (!subtasks.containsKey(subtask.getTaskId())) {
+            return;
+        }
+
+        if (initial == null) {
+            throw new NotFoundException("Subtask id=" + subtask.getTaskId());
+        }
+
+        if (getEpicPerId(subtask.getEpicId()) == null) {
+            System.out.println("Такого эпика не существует.");
+            return;
+        }
+
+        initial.setTaskName(subtask.getTaskName());
+        initial.setTaskName(subtask.getTaskDescription());
+        initial.setStatus(subtask.getStatus());
+        subtasks.put(subtask.getTaskId(), subtask);
+
+
+        if (!checkTaskTime(subtask) ) {
+            prioritizedTasks.remove(initial);
+            add(subtask);
+        }
+
+
+        calculateStatus(epics.get(subtask.getEpicId()));
+    }
+
         @Override
         public boolean checkTaskTime(Task task) { // Проверка на отдельные отрезки времени
 
-        for (Task t : prioritizedTasks) {
-            if (t.getTaskId() == task.getTaskId()) {
+        for (Task existing : prioritizedTasks) {
+            if (existing.getTaskId() == task.getTaskId()) {
+                continue;
+            }
+
+            if (!( task.getEndTime().isBefore(existing.getStartTime()) || task.getStartTime().isAfter(existing.getEndTime())) ) {
+                return true; // пересекаются
+            }
+        }
+        return false;
+    }
+
+/*    public boolean checkTaskTime(Subtask subtask) { // Проверка на отдельные отрезки времени
+
+        for (Task s : prioritizedTasks) {
+            if (s.getTaskId() == subtask.getTaskId()) {
                 continue;
             }
 
             if (
-                    ( (t.getStartTime().isBefore(task.getStartTime()) && t.getStartTime().isBefore(task.getEndTime()) )
-                            &&  t.getEndTime().isBefore(task.getStartTime()) && t.getEndTime().isBefore(task.getEndTime()) )
+                    ( (s.getStartTime().isBefore(subtask.getStartTime()) && s.getStartTime().isBefore(subtask.getEndTime()) )
+                            &&  s.getEndTime().isBefore(subtask.getStartTime()) && s.getEndTime().isBefore(subtask.getEndTime()) )
 
-                    || ( (t.getStartTime().isAfter(task.getStartTime()) && t.getStartTime().isAfter(task.getEndTime()) )
-                            && t.getEndTime().isAfter(task.getStartTime()) && t.getEndTime().isAfter(task.getEndTime()) )
+                            || ( (s.getStartTime().isAfter(subtask.getStartTime()) && s.getStartTime().isAfter(subtask.getEndTime()) )
+                            && s.getEndTime().isAfter(subtask.getStartTime()) && s.getEndTime().isAfter(subtask.getEndTime()) )
 
-                ) return true;
+            ) return true;
         }
         return false;
-    }
+    }*/
 
     @Override
     public List<Task> getPrioritizedTasks() {
@@ -172,35 +288,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task createTask(Task task) {
-
-        if (task == null) {
-            return task;
-        }
-
-
-        task.setTaskId(generateId());
-        tasks.put(task.getTaskId(), task);
-
-        return task;
-    }
-
-    @Override
-    public Subtask createSubtask(Subtask subtask) {
-
-        subtask.setTaskId(generateId());
-
-        Epic savedEpic = epics.get(subtask.getEpicId());
-        if (savedEpic == null) {
-            return subtask;
-        }
-        savedEpic.setSubtasks(subtask);
-        subtasks.put(subtask.getTaskId(), subtask);
-        calculateStatus(savedEpic);
-        return subtask;
-    }
-
-    @Override
     public Epic createEpic(Epic epic) {
 
         if (epic == null) {
@@ -232,31 +319,6 @@ public class InMemoryTaskManager implements TaskManager {
 
         epics.put(saved.getTaskId(), epic);
 
-    }
-
-    @Override
-    public void subtaskUpdate(Subtask subtask) {
-        Subtask saved = subtasks.get(subtask.getTaskId());
-
-        if (!subtasks.containsKey(subtask.getTaskId())) {
-            return;
-        }
-
-        if (saved == null) {
-            throw new NotFoundException("Subtask id=" + subtask.getTaskId());
-        }
-
-        if (getEpicPerId(subtask.getEpicId()) == null) {
-            System.out.println("Такого эпика не существует.");
-            return;
-        }
-
-        saved.setTaskName(subtask.getTaskName());
-        saved.setTaskName(subtask.getTaskDescription());
-        saved.setStatus(subtask.getStatus());
-        subtasks.put(subtask.getTaskId(), subtask);
-
-        calculateStatus(epics.get(subtask.getEpicId()));
     }
 
     @Override
@@ -312,15 +374,12 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public ArrayList<Subtask> getSubtaskPerEpic(Epic epic) {
 
-        ArrayList<Subtask> subtasksList = new ArrayList<>();
 
-        for (Integer subId : epic.getSubtasks()) {
-            subtasksList.add(subtasks.get(subId));
-        }
-        return subtasksList;
+        return epic.getSubtasks().stream()
+                .map(subId -> subtasks.get(subId))
+                .collect(Collectors.toCollection(ArrayList::new));
+
     }
-
-//    public LocalDateTime getEndTime()
 
 
     public void calculateStatus(Epic epic) {
