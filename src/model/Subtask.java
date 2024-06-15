@@ -1,5 +1,6 @@
 package model;
 
+import java.time.Instant;
 import java.util.Objects;
 
 public class Subtask extends Task {
@@ -10,9 +11,9 @@ public class Subtask extends Task {
 
     }
 
-    public Subtask(String taskName, String taskDescription, TaskStatus status) {
-        super(taskName, taskDescription, status);
+    public Subtask(String taskName, String taskDescription, TaskStatus status, int id, Instant startTime, int duration) {
 
+        super(taskName, taskDescription, status, id, startTime, duration);
     }
 
     public Subtask(int epicId, String taskName, String taskDescription, TaskStatus status) {
@@ -20,10 +21,11 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
-    public Subtask(String taskName, String taskDescription, TaskStatus status, int id) {
+    public Subtask(String taskName, String taskDescription, TaskStatus status) {
+        super(taskName, taskDescription, status);
 
-        super(taskName, taskDescription, status, id);
     }
+
 
     @Override
     public TaskType getType() {

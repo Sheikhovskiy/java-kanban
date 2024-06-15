@@ -14,12 +14,9 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FileBackedTaskManagerTest {
+class FileBackedTaskManagerTest extends TaskManagerTest {
 
-
-    FileBackedTaskManager fileBackedTaskManager;
     FileBackedTaskManager fileBackedTaskManagerWithFile;
-    TaskManager taskManager;
 
     File tempFile;
 
@@ -30,24 +27,31 @@ class FileBackedTaskManagerTest {
     private Task task3;
 
 
-    @BeforeEach
-    void setUp() {
-        fileBackedTaskManager = Managers.getDefaultFileBackedManager();
-        taskManager = Managers.getDefaultTaskManager();
-
+    @Override
+    protected TaskManager createTaskmanager() {
         try {
             tempFile = File.createTempFile("Temp_File", ".csv");
-            fileBackedTaskManagerWithFile = new FileBackedTaskManager(tempFile);
+            return new FileBackedTaskManager(tempFile);
 
-        } catch (IOException exception){
-            System.out.println(exception.getMessage());
+        } catch (IOException exception) {
+            throw new RuntimeException(exception.getMessage());
         }
+    }
 
-        epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW);
-        subtask1 = new Subtask("Подзадача 1", "Описание 1", TaskStatus.NEW);
+    @BeforeEach
+    void setUp() {
+
+        super.setUp();
+
+        fileBackedTaskManagerWithFile = (FileBackedTaskManager) createTaskmanager();
+
+
+        epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW, 1);
+        subtask1 = new Subtask(epic1.getTaskId(), "Подзадача 1", "Описание 1", TaskStatus.NEW);
         task1 = new Task("Задача 1", "Описание 1", TaskStatus.IN_PROGRESS);
-        task2 = new Task("Задача 2", "Описание 2", TaskStatus.IN_PROGRESS);
-        task3 = new Task("Задача 3", "Описание 3", TaskStatus.IN_PROGRESS);
+        task2 = new Task("Задача 2", "Описание 2", TaskStatus.DONE);
+        task3 = new Task("Задача 3", "Описание 3", TaskStatus.DONE);
+
     }
 
 
@@ -86,7 +90,6 @@ class FileBackedTaskManagerTest {
 
     @Test
     void shouldLoadMultipleTasks() {
-
         fileBackedTaskManagerWithFile.createTask(task1);
         fileBackedTaskManagerWithFile.createTask(task2);
         fileBackedTaskManagerWithFile.createTask(task3);
@@ -99,10 +102,34 @@ class FileBackedTaskManagerTest {
 
         fileBackedTaskManagerWithFile.deleteEpicById(epic1.getTaskId());
 
-        FileBackedTaskManager.loadFromFile(tempFile);
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
 
-        assertEquals(3, fileBackedTaskManagerWithFile.tasks.size() + fileBackedTaskManager.epics.size());
+        assertEquals(3, loadedManager.printListOfAllTasks().size() + loadedManager.printListOfAllEpics().size());
     }
+
+
+    @Test
+    void shouldLoadTaskWithDurationAndStartTime() {
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

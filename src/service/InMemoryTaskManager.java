@@ -1,10 +1,9 @@
 package service;
 
+import OwnExceptions.NotFoundException;
 import model.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -18,13 +17,64 @@ public class InMemoryTaskManager implements TaskManager {
         epics = new HashMap<>();
     }
 
+    TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+
+
     HistoryManager historyManager = Managers.getDefaultHistory();
 
     int idCount = 0;
 
-    public int generateId(){
+    public int generateId() {
         return ++idCount;
     }
+
+
+
+    @Override
+    public void taskUpdate(Task task) {
+
+        Task initial = tasks.get(task.getTaskId());
+
+        if (initial == null) {
+            throw new NotFoundException("Task id=" + task.getTaskId());
+        }
+
+        if (checkTaskTime(task) ) {
+            prioritizedTasks.remove(initial);
+            prioritizedTasks.add(task);
+        }
+//        prioritizedTasks.remove(initial);
+//        prioritizedTasks.add(task);
+
+
+        tasks.put(task.getTaskId(), task);
+    }
+
+        @Override
+        public boolean checkTaskTime(Task task) { // Проверка на отдельные отрезки времени
+
+        for (Task t : prioritizedTasks) {
+            if (t.getTaskId() == task.getTaskId()) {
+                continue;
+            }
+
+            if (
+                    ( (t.getStartTime().isBefore(task.getStartTime()) && t.getStartTime().isBefore(task.getEndTime()) )
+                            &&  t.getEndTime().isBefore(task.getStartTime()) && t.getEndTime().isBefore(task.getEndTime()) )
+
+                    || ( (t.getStartTime().isAfter(task.getStartTime()) && t.getStartTime().isAfter(task.getEndTime()) )
+                            && t.getEndTime().isAfter(task.getStartTime()) && t.getEndTime().isAfter(task.getEndTime()) )
+
+                ) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTasks);
+    }
+
 
     @Override
     public List<Task> getHistory() {
@@ -57,6 +107,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         return listOfAllSubtasks;
     }
+
     @Override
     public List<Task> printListOfAllEpics() {
         List<Task> listOfAllEpics = new ArrayList<>();
@@ -73,6 +124,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteAllTasks() {
         tasks.clear();
     }
+
     public void deleteAllSubtasks() {
         for (Epic epic : epics.values()) {
             epic.getSubtasks().clear();
@@ -80,11 +132,13 @@ public class InMemoryTaskManager implements TaskManager {
         }
         subtasks.clear();
     }
+
     @Override
     public void deleteAllEpics() {
         subtasks.clear();
         epics.clear();
     }
+
     @Override
     public Task getTaskPerId(int id) {
 
@@ -116,14 +170,21 @@ public class InMemoryTaskManager implements TaskManager {
         }
         return askedEpic;
     }
+
     @Override
     public Task createTask(Task task) {
+
+        if (task == null) {
+            return task;
+        }
+
 
         task.setTaskId(generateId());
         tasks.put(task.getTaskId(), task);
 
         return task;
     }
+
     @Override
     public Subtask createSubtask(Subtask subtask) {
 
@@ -138,30 +199,41 @@ public class InMemoryTaskManager implements TaskManager {
         calculateStatus(savedEpic);
         return subtask;
     }
+
     @Override
     public Epic createEpic(Epic epic) {
+
+        if (epic == null) {
+            return epic;
+
+        }
 
         epic.setTaskId(generateId());
         epics.put(epic.getTaskId(), epic);
         return epic;
     }
-    @Override
+
+/*    @Override
     public void taskUpdate(Task task) {
+
         tasks.put(task.getTaskId(), task);
-    }
+    }*/
+
     @Override
     public void epicUpdate(Epic epic) {
         Epic saved = epics.get(epic.getTaskId());
 
         if (saved == null) {
-            return;
+            throw new NotFoundException("Epic id=" + epic.getTaskId());
         }
 
         saved.setTaskName(epic.getTaskName());
         saved.setTaskDescription(epic.getTaskDescription());
 
         epics.put(saved.getTaskId(), epic);
+
     }
+
     @Override
     public void subtaskUpdate(Subtask subtask) {
         Subtask saved = subtasks.get(subtask.getTaskId());
@@ -171,7 +243,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (saved == null) {
-            return;
+            throw new NotFoundException("Subtask id=" + subtask.getTaskId());
         }
 
         if (getEpicPerId(subtask.getEpicId()) == null) {
@@ -186,9 +258,10 @@ public class InMemoryTaskManager implements TaskManager {
 
         calculateStatus(epics.get(subtask.getEpicId()));
     }
+
     @Override
     public void deleteTaskById(int taskId) {
-        if (!tasks.containsKey(taskId)){
+        if (!tasks.containsKey(taskId)) {
             System.out.println("Такого id не существует");
             return;
         }
@@ -196,6 +269,7 @@ public class InMemoryTaskManager implements TaskManager {
         tasks.remove(taskId);
         historyManager.remove(taskId);
     }
+
     @Override
     public void deleteSubtaskById(int subtaskId) {
 
@@ -218,9 +292,10 @@ public class InMemoryTaskManager implements TaskManager {
         calculateStatus(epic);
 
     }
+
     @Override
     public void deleteEpicById(int epicId) {
-        if (!epics.containsKey(epicId)){
+        if (!epics.containsKey(epicId)) {
             System.out.println("Такого id не существует");
             return;
         }
@@ -233,6 +308,7 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.remove(epicId);
 
     }
+
     @Override
     public ArrayList<Subtask> getSubtaskPerEpic(Epic epic) {
 
@@ -243,6 +319,8 @@ public class InMemoryTaskManager implements TaskManager {
         }
         return subtasksList;
     }
+
+//    public LocalDateTime getEndTime()
 
 
     public void calculateStatus(Epic epic) {
@@ -275,4 +353,10 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
     }
+
+
+
+
+
+
 }

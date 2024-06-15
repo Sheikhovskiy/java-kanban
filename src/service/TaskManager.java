@@ -7,6 +7,11 @@ import java.util.List;
 
 public interface TaskManager {
 
+
+
+        boolean checkTaskTime(Task task);
+
+        List<Task> getPrioritizedTasks();
         List<Task> printListOfAllTasks();
 
         List<Task> printListOfAllSubtasks();

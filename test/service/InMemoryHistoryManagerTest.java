@@ -45,13 +45,77 @@ class InMemoryHistoryManagerTest {
         taskManager.createTask(task2);
         taskManager.getTaskPerId(task2.getTaskId());
 
-
-
-
-        assertEquals(taskManager.getHistory().size(), 4, "В истории задач, должны сохранятся " +
+        assertEquals(4, taskManager.getHistory().size(), "В истории задач, должны сохранятся " +
                 "все виды задач");
 
     }
+
+    @Test
+    void shouldReturnEmptyStory() {
+        taskManager.createTask(task1);
+
+        taskManager.createSubtask(subtask1);
+
+        taskManager.createEpic(epic1);
+
+
+        assertEquals(0, taskManager.getHistory().size(),  "При отсутствие вызова метода, сохраняющегося историю, история должна оставаться пустой");
+
+    }
+
+
+
+    @Test
+    void shouldHistoryNotContainDuplicates() {
+
+        taskManager.createEpic(epic1);
+
+        taskManager.createTask(task1);
+
+        subtask1.setEpicId(epic1.getTaskId());
+        taskManager.createSubtask(subtask1);
+
+        taskManager.getEpicPerId(epic1.getTaskId());
+
+        taskManager.getSubtaskPerId(subtask1.getTaskId());
+
+        taskManager.getTaskPerId(task1.getTaskId());
+
+        taskManager.createTask(task2);
+        taskManager.getTaskPerId(task2.getTaskId());
+
+        taskManager.getTaskPerId(task1.getTaskId());
+        taskManager.getTaskPerId(task2.getTaskId());
+
+
+
+        assertEquals(4, taskManager.getHistory().size(), "В истории сохраняются только уникальные задачи");
+    }
+
+
+    @Test
+    void shouldBeAbleToDeleteFromHistory() {
+
+        taskManager.createTask(task1);
+
+        subtask1.setEpicId(epic1.getTaskId());
+        taskManager.createSubtask(subtask1);
+
+        taskManager.createTask(task2);
+
+        taskManager.createEpic(epic1);
+
+        taskManager.getTaskPerId(task1.getTaskId());
+        taskManager.getTaskPerId(task2.getTaskId());
+        taskManager.getSubtaskPerId(subtask1.getTaskId());
+        taskManager.getEpicPerId(epic1.getTaskId());
+
+        taskManager.deleteTaskById(task1.getTaskId());
+
+        assertEquals(2, taskManager.getHistory().size());
+
+    }
+
 
 
 }

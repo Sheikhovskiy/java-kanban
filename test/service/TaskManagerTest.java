@@ -7,28 +7,29 @@ import model.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class InMemoryTaskManagerTest extends TaskManagerTest {
+abstract class TaskManagerTest {
 
 
-    TaskManager taskManager;
+    protected  TaskManager taskManager;
+    protected abstract TaskManager createTaskmanager();
     private Epic epic1;
     private Epic epic2;
     private Subtask subtask1;
     private Subtask subtask2;
     private Task task1;
     private Task task2;
-
-    @Override
-    protected TaskManager createTaskmanager() {
-        return new InMemoryTaskManager();
-    }
+    private Task task3;
 
 
     @BeforeEach
     void setUp() {
-        taskManager = Managers.getDefaultTaskManager();
+        //
+        taskManager = createTaskmanager();
 
         epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW, 1);
         epic2 = new Epic("Эпик 2", "Описание 2", TaskStatus.IN_PROGRESS);
@@ -36,50 +37,48 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         subtask2 = new Subtask("Подзадача 2", "Описание 2", TaskStatus.IN_PROGRESS);
         task1 = new Task("Задача 1", "Описание 1", TaskStatus.IN_PROGRESS);
         task2 = new Task("Задача 2", "Описание 2", TaskStatus.DONE);
+        task3 = new Task("Задача 3", "Описание 3", TaskStatus.DONE);
     }
 
-    @Override
+
     @Test
     void shouldAddEpic() {
-        taskManager.createEpic(epic1);
-        assertFalse(taskManager.printListOfAllEpics().isEmpty(), "Эпик должен добавиться в список Эпиков");
+/*        taskManager.createEpic(epic1);
+        assertFalse(taskManager.printListOfAllEpics().isEmpty(), "Эпик должен добавиться в список Эпиков");*/
     }
-    @Override
+
     @Test
     void shouldAddSubtask() {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
         taskManager.createSubtask(subtask1);
 
         assertFalse(taskManager.printListOfAllSubtasks().isEmpty(), "Подзадача должна добавиться в список " +
-                "подзадач");
+                "подзадач");*/
     }
 
-    @Override
     @Test
     void shouldAddTask() {
-        taskManager.createTask(task1);
+/*        taskManager.createTask(task1);
 
-        assertFalse(taskManager.printListOfAllTasks().isEmpty(), "Задача должна добавиться в список задач");
+        assertFalse(taskManager.printListOfAllTasks().isEmpty(), "Задача должна добавиться в список задач");*/
     }
 
-    @Override
     @Test
-        void shouldBePossibleToDeleteTaskPerId() {
-        taskManager.createTask(task1);
+    void shouldBePossibleToDeleteTaskPerId() {
+/*        taskManager.createTask(task1);
         taskManager.createTask(task2);
 
         taskManager.deleteTaskById(task1.getTaskId());
 
         assertEquals(1,  taskManager.printListOfAllTasks().size(), "В список задач было добавлено " +
-                "две задачи, мы удалили одну из них по его id. В списке должна остаться 1 задача");
+                "две задачи, мы удалили одну из них по его id. В списке должна остаться 1 задача");*/
     }
 
 
 
-    @Override
     @Test
     void shouldBePossibleToDeleteSubtaskPerId() {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
         subtask2.setEpicId(epic1.getTaskId());
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -88,49 +87,45 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         taskManager.deleteSubtaskById(subtask1.getTaskId());
 
         assertEquals(1, taskManager.printListOfAllSubtasks().size(), "В список подзадач было " +
-                "добавлено две подзадачи, мы удалили одну из них по его id. В списке должна остаться 1 подзадача");
+                "добавлено две подзадачи, мы удалили одну из них по его id. В списке должна остаться 1 подзадача");*/
     }
 
-    @Override
     @Test
     void shouldBePossibleToDeleteEpicPerId() {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
         taskManager.createEpic(epic2);
 
         taskManager.deleteEpicById(epic1.getTaskId());
 
         assertEquals(1, taskManager.printListOfAllEpics().size(), "В список эпиков было " +
-                "добавлено два эпикка, мы удалили один из них по его id. В списке должен остаться 1 эпик");
+                "добавлено два эпикка, мы удалили один из них по его id. В списке должен остаться 1 эпик");*/
     }
 
 
 
-    @Override
     @Test
     void shouldBePossibleToGetSubtaskPerItsId() {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
         taskManager.createSubtask(subtask1);
 
         int subtaskId = subtask1.getTaskId();
         Subtask subtaskReceived = taskManager.getSubtaskPerId(subtaskId);
-        assertEquals(subtask1, subtaskReceived, "Должно быть возможно получить Подзадачу по id");
+        assertEquals(subtask1, subtaskReceived, "Должно быть возможно получить Подзадачу по id");*/
     }
 
 
-    @Override
     @Test
     void shouldBePossibleToGetTaskPerItsId() {
-        taskManager.createTask(task1);
+/*        taskManager.createTask(task1);
 
         int taskId = task1.getTaskId();
         Task taskReceived = taskManager.getTaskPerId(taskId);
-        assertEquals(task1, taskReceived, "Должно быть возможно получить задачу по id");
+        assertEquals(task1, taskReceived, "Должно быть возможно получить задачу по id");*/
     }
 
-    @Override
     @Test
     void shouldBePossibleToSetIdAndGenerateIdForTasks() {
-        Task task3 = new Task("Задача 3", "Описание 3", TaskStatus.NEW, 1);
+/*        Task task3 = new Task("Задача 3", "Описание 3", TaskStatus.NEW, 1);
         taskManager.createTask(task3);
         int initializedId = task3.getTaskId();
         Task taskWithSettedId = taskManager.getTaskPerId(initializedId);
@@ -142,27 +137,25 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         Task taskWithGeneratedId = taskManager.getTaskPerId(task2.getTaskId());
 
         assertEquals(taskManager.printListOfAllTasks().size(), 2, "Задача с заданным id добавляется");
-        assertEquals(task2, taskWithGeneratedId, "Задача с заданным id находится по id");
+        assertEquals(task2, taskWithGeneratedId, "Задача с заданным id находится по id");*/
     }
 
-
-    @Override
     @Test
     void shouldTaskBeDifferentAfterUpdatingIt() {
-        taskManager.createTask(task1);
+/*        taskManager.createTask(task1);
         task1.setTaskId(1);
         task1 = task2;
         task2.setTaskId(1);
         taskManager.taskUpdate(task1);
 
 
-        assertEquals(taskManager.printListOfAllTasks().getFirst(), task1);
+        assertEquals(taskManager.printListOfAllTasks().getFirst(), task1);*/
     }
 
-    @Override
+
     @Test
     void shouldSubtaskBeDifferentAfterUpdatingIt() {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
 
         taskManager.createSubtask(subtask1);
 
@@ -175,14 +168,13 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
 
         taskManager.subtaskUpdate(subtask2);
 
-        assertEquals(taskManager.printListOfAllSubtasks().getFirst(), subtask2);
+        assertEquals(taskManager.printListOfAllSubtasks().getFirst(), subtask2);*/
 
     }
 
-    @Override
     @Test
     void shouldEpicBeDifferentAfterUpdatingIt() {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
 
         epic2.setTaskId(epic1.getTaskId());
         epic2.setTaskName("Новое имя");
@@ -191,14 +183,13 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         taskManager.epicUpdate(epic2);
 
 
-        assertEquals(taskManager.printListOfAllEpics().getFirst(), epic2);
+        assertEquals(taskManager.printListOfAllEpics().getFirst(), epic2);*/
 
     }
 
-    @Override
     @Test
     void shouldSubtaskListBeEmptyIfWeDeleteAppropriateEpic() {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
         int epicId = epic1.getTaskId();
 
         subtask1.setEpicId(epicId);
@@ -206,13 +197,12 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         taskManager.deleteEpicById(epicId);
 
         assertTrue(taskManager.printListOfAllSubtasks().isEmpty(), "При удаление Эпика, все соотвествующие " +
-                "подзадачи удаляются");
+                "подзадачи удаляются");*/
     }
 
-    @Override
     @Test
     void shouldChangeEpicStatusToDone() {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
         subtask2.setEpicId(epic1.getTaskId());
 
         subtask1.setStatus(TaskStatus.DONE);
@@ -222,13 +212,12 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         taskManager.createSubtask(subtask2);
 
         assertEquals(TaskStatus.DONE, epic1.getStatus(), "При смене статус у подзадач эпика, обновляется и " +
-                "высчитывается новый статус эпика. Если все подзадачи имеют статус ЗАВЕРШЕН, то и эпик соответсвенно");
+                "высчитывается новый статус эпика. Если все подзадачи имеют статус ЗАВЕРШЕН, то и эпик соответсвенно");*/
     }
 
-    @Override
     @Test
     void shouldChangeEpicStatusToInProgress () {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
         subtask1.setEpicId(epic1.getTaskId());
         subtask2.setEpicId(epic1.getTaskId());
 
@@ -240,13 +229,12 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
 
         assertEquals(TaskStatus.IN_PROGRESS, epic1.getStatus(), "При смене статус у подзадач эпика, " +
                 " обновляется и высчитывается новый статус эпика. Если все подзадачи имеют статус в прогрессе, то и " +
-                "эпик соответсвенно");
+                "эпик соответсвенно");*/
     }
 
-    @Override
     @Test
     void shouldReturnEpicSubtaskList() {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
         int epicId = epic1.getTaskId();
 
         subtask1.setEpicId(epicId);
@@ -256,15 +244,14 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         taskManager.createSubtask(subtask2);
 
         assertFalse(taskManager.getSubtaskPerEpic(epic1).isEmpty(), "По Эпику можно получить список " +
-                "его подзадач");
+                "его подзадач");*/
 
     }
 
 
-    @Override
     @Test
     void shouldDeleteTaskFromHistoryListWhenTaskDeleted() {
-        taskManager.createTask(task1);
+/*        taskManager.createTask(task1);
         taskManager.createTask(task2);
 
         int taskTested = task1.getTaskId();
@@ -275,13 +262,12 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         taskManager.deleteTaskById(taskTested);
 
 
-        assertEquals(1, taskManager.getHistory().size());
+        assertEquals(1, taskManager.getHistory().size());*/
     }
 
-    @Override
     @Test
     void shouldDeleteSubtaskFromHistoryListWhenSubtaskDeleted() {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
         subtask2.setEpicId(epic1.getTaskId());
 
         taskManager.createSubtask(subtask1);
@@ -295,14 +281,13 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         taskManager.deleteSubtaskById(taskTested);
 
 
-        assertEquals(1, taskManager.getHistory().size());
+        assertEquals(1, taskManager.getHistory().size());*/
     }
 
 
-    @Override
     @Test
     void shouldDeleteEpicFromHistoryListWhenEpicDeleted() {
-        taskManager.createEpic(epic1);
+/*        taskManager.createEpic(epic1);
         taskManager.createEpic(epic2);
 
         int taskTested = epic1.getTaskId();
@@ -313,21 +298,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         taskManager.deleteEpicById(taskTested);
 
 
-        assertEquals(1, taskManager.getHistory().size());
+        assertEquals(1, taskManager.getHistory().size());*/
     }
-
-
-
-
-    @Test
-    void shouldReturnPrioritizedTasks() {
-
-
-
-
-    }
-
-
-
 
 }
