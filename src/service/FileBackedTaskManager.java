@@ -136,7 +136,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
                 }
 
-            loadedTaskManager.idCount = maxId;
+            loadedTaskManager.setIdCount(maxId);
 
 
         } catch (IOException exception) {
@@ -193,7 +193,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 break;
 
             case EPIC:
-                task = new Epic(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
+                task = new Epic(receivedStr[2], receivedStr[4], Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
                 break;
 
         }

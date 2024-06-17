@@ -36,8 +36,8 @@ abstract class TaskManagerTest {
         //
         taskManager = createTaskmanager();
 
-        epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW, 1);
-        epic2 = new Epic("Эпик 2", "Описание 2", TaskStatus.IN_PROGRESS);
+        epic1 = new Epic("Эпик 1", "Описание 1");
+        epic2 = new Epic("Эпик 2", "Описание 2");
         subtask1 = new Subtask(epic1.getTaskId(), "Подзадача 1", "Описание 1", TaskStatus.NEW);
         subtask2 = new Subtask("Подзадача 2", "Описание 2", TaskStatus.IN_PROGRESS);
         task1 = new Task("Задача 1", "Описание 1", TaskStatus.IN_PROGRESS);

@@ -22,8 +22,8 @@ class EpicTest {
      void setUp() {
         taskManager = Managers.getDefaultTaskManager();
 
-        epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW);
-        epic2 = new Epic("Эпик 2", "Описание 2", TaskStatus.NEW);
+        epic1 = new Epic("Эпик 1", "Описание 1");
+        epic2 = new Epic("Эпик 2", "Описание 2");
         subtask1 = new Subtask("Подзадача 1", "Описание 1", TaskStatus.NEW);
         subtask2 = new Subtask("Подзадача 2", "Описание 2", TaskStatus.NEW);
 

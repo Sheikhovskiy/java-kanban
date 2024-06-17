@@ -23,7 +23,7 @@ class InMemoryHistoryManagerTest {
     void setUp() {
         taskManager = Managers.getDefaultTaskManager();
 
-        epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW);
+        epic1 = new Epic("Эпик 1", "Описание 1");
         subtask1 = new Subtask("Подзадача 1", "Описание 1", TaskStatus.NEW);
         task1 = new Task("Задача 1", "Описание 1", TaskStatus.IN_PROGRESS);
         task2 = new Task("Задача 2", "Описание 2", TaskStatus.IN_PROGRESS);

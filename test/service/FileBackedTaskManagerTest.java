@@ -40,7 +40,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
         fileBackedTaskManagerWithFile = (FileBackedTaskManager) createTaskmanager();
 
 
-        epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW, 1);
+        epic1 = new Epic("Эпик 1", "Описание 1", 1);
         subtask1 = new Subtask(epic1.getTaskId(), "Подзадача 1", "Описание 1", TaskStatus.NEW);
         task1 = new Task("Задача 1", "Описание 1", TaskStatus.IN_PROGRESS);
         task2 = new Task("Задача 2", "Описание 2", TaskStatus.DONE);
@@ -130,7 +130,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
     void shouldLoadSubtaskWithDurationAndStartTime() {
 
 
-        epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW, 1);
+        epic1 = new Epic("Эпик 1", "Описание 1",  1);
         fileBackedTaskManagerWithFile.createEpic(epic1);
 
 

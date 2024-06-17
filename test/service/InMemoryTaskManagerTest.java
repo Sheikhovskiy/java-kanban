@@ -25,8 +25,8 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
     void setUp() {
         taskManager = Managers.getDefaultTaskManager();
 
-        epic1 = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW, 1);
-        epic2 = new Epic("Эпик 2", "Описание 2", TaskStatus.IN_PROGRESS);
+        epic1 = new Epic("Эпик 1", "Описание 1");
+        epic2 = new Epic("Эпик 2", "Описание 2");
         subtask1 = new Subtask(epic1.getTaskId(), "Подзадача 1", "Описание 1", TaskStatus.NEW);
         subtask2 = new Subtask("Подзадача 2", "Описание 2", TaskStatus.IN_PROGRESS);
         task1 = new Task("Задача 1", "Описание 1", TaskStatus.IN_PROGRESS);
@@ -43,6 +43,8 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
     @Test
     void shouldAddSubtask() {
         taskManager.createEpic(epic1);
+
+        subtask1.setEpicId(epic1.getTaskId());
         taskManager.createSubtask(subtask1);
 
         assertFalse(taskManager.printListOfAllSubtasks().isEmpty(), "Подзадача должна добавиться в список " +
@@ -104,6 +106,8 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
     @Test
     void shouldBePossibleToGetSubtaskPerItsId() {
         taskManager.createEpic(epic1);
+
+        subtask1.setEpicId(epic1.getTaskId());
         taskManager.createSubtask(subtask1);
 
         int subtaskId = subtask1.getTaskId();
@@ -159,6 +163,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
     void shouldSubtaskBeDifferentAfterUpdatingIt() {
         taskManager.createEpic(epic1);
 
+        subtask1.setEpicId(epic1.getTaskId());
         taskManager.createSubtask(subtask1);
 
         subtask2.setEpicId(subtask1.getEpicId());
@@ -278,6 +283,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
     void shouldDeleteSubtaskFromHistoryListWhenSubtaskDeleted() {
         taskManager.createEpic(epic1);
         subtask2.setEpicId(epic1.getTaskId());
+        subtask1.setEpicId(epic1.getTaskId());
 
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -338,10 +344,11 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         subtaskInstant1 = new Subtask("Временная Подзадача", "Описание В. задачи", TaskStatus.NEW,  Instant.now().plusSeconds(10), 3 );
         subtaskInstant2 = new Subtask("Временная Подзадача 2", "Описание В. задачи 2", TaskStatus.NEW,  Instant.now().plusSeconds(500), 7 );
 
+        taskManager.createEpic(epic1);
+
         subtaskInstant1.setEpicId(epic1.getTaskId());
         subtaskInstant2.setEpicId(epic1.getTaskId());
 
-        taskManager.createEpic(epic1);
 
         taskManager.createSubtask(subtaskInstant1);
         taskManager.createSubtask(subtaskInstant2);
@@ -359,15 +366,17 @@ public class InMemoryTaskManagerTest extends TaskManagerTest {
         subtaskInstant1 = new Subtask("Временная Подзадача", "Описание В. задачи", TaskStatus.NEW,  Instant.now().plusSeconds(10), 3 );
         subtaskInstant2 = new Subtask("Временная Подзадача 2", "Описание В. задачи 2", TaskStatus.NEW,  Instant.now().plusSeconds(500), 7 );
 
+        taskManager.createEpic(epic1);
+
         subtaskInstant1.setEpicId(epic1.getTaskId());
         subtaskInstant2.setEpicId(epic1.getTaskId());
-
-        taskManager.createEpic(epic1);
 
         taskManager.createSubtask(subtaskInstant1);
         taskManager.createSubtask(subtaskInstant2);
 
-        assertEquals(10, epic1.getDuration());
+        taskManager.deleteSubtaskById(subtaskInstant1.getTaskId());
+
+        assertEquals(7, epic1.getDuration());
 
     }
 

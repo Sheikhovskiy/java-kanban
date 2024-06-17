@@ -64,6 +64,27 @@ public class Task {
 
     }
 
+    public Task(String taskName, String taskDescription, int id, Instant startTime, int duration) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskId = id;
+
+        this.startTime = startTime;
+        this.duration = duration;
+
+    }
+
+    public Task(String taskName, String taskDescription, int id) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskId = id;
+    }
+
+    public Task(String taskName, String taskDescription) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+    }
+
 
     public TaskType getType() {
         return TaskType.TASK;
