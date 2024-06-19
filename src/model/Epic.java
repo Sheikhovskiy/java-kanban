@@ -1,5 +1,12 @@
 package model;
 
+import service.InMemoryTaskManager;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -8,14 +15,20 @@ public class Epic extends Task {
     protected ArrayList<Integer> subtasksId = new ArrayList<>();
 
 
-    public Epic(String taskName, String taskDescription, TaskStatus status) {
 
-        super(taskName, taskDescription, status);
+    public Epic(String taskName, String taskDescription, int id, Instant startTime, int duration) {
+
+        super(taskName, taskDescription, id, startTime, duration);
     }
 
-    public Epic(String taskName, String taskDescription, TaskStatus status, int id) {
+    public Epic(String taskName, String taskDescription, int id) {
 
-        super(taskName, taskDescription, status, id);
+        super(taskName, taskDescription, id);
+    }
+
+    public Epic(String taskName, String taskDescription) {
+
+        super(taskName, taskDescription);
     }
 
     public Epic() {
@@ -25,10 +38,13 @@ public class Epic extends Task {
         return subtasksId;
     }
 
+
     public void setSubtasks(Subtask subtask) {
 
         this.subtasksId.add(subtask.getTaskId());
+
     }
+
 
 
     @Override
@@ -55,5 +71,24 @@ public class Epic extends Task {
         Epic epic = (Epic) o;
         return Objects.equals(subtasksId, epic.subtasksId);
     }
+
+
+
+    public Instant getEndTime() {
+        return this.endTime;
+    }
+
+    public void setStartTime(Instant startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(Instant endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
 
 }

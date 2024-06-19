@@ -2,7 +2,9 @@ package service;
 import model.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.time.*;
 
 import OwnExceptions.ManagerSaveException;
 
@@ -34,6 +36,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             }
 
             for (Epic epic : epics.values()) {
+                System.out.println(epic);
                 bufferedWriter.write(toString(epic));
                 bufferedWriter.newLine();
             }
@@ -69,7 +72,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             for (int i = 0; i < lines.length; i++) {
 
 
-
                 String line = lines[i];
 
                 if (line.isEmpty()) {
@@ -83,6 +85,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 }
 
                 Task taskRecovered = fromString(lines[i]);
+                System.out.println(taskRecovered);
 
 
                 int idRecovered = taskRecovered.getTaskId();
@@ -100,11 +103,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                         loadedTaskManager.subtasks.put(idRecovered, (Subtask) taskRecovered);
                         break;
                     case EPIC:
+                        //System.out.println(loadedTaskManager.printListOfAllEpics());
                         loadedTaskManager.epics.put(idRecovered, (Epic) taskRecovered);
                         break;
 
                 }
-
+            }
 
                 for (Map.Entry<Integer, Subtask> entry : loadedTaskManager.subtasks.entrySet()) {
                     Subtask subtask = entry.getValue();
@@ -114,7 +118,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
                 }
 
-            }
+            //}
                 for (Integer taskId : historyRecovered) {
 
                     Task task = loadedTaskManager.tasks.get(taskId);
@@ -132,7 +136,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
                 }
 
-            loadedTaskManager.idCount = maxId;
+            loadedTaskManager.setIdCount(maxId);
 
 
         } catch (IOException exception) {
@@ -144,6 +148,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     String toString(Task task) {
 
+        //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddT:mm:ss");
+
         String result =
                 String.valueOf(task.getTaskId()) + ","
                 + task.getType() + ","
@@ -152,33 +158,42 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 + task.getTaskDescription() + ",";
 
                 if (task.getType() == TaskType.SUBTASK){
-                    result += getSubtaskPerId(task.getTaskId()).getEpicId();
+                    result += getSubtaskPerId(task.getTaskId()).getEpicId() + ",";
                 } else {
-                    result += "null";
+                    result += "null,";
                 }
+                result += task.getDuration() + ","
+
+                       + (task.getStartTime().toString());
+
         return result +"\n";
     }
 
     static Task fromString(String value) {
         String[] receivedStr = value.split(",");
 
+//        System.out.println(receivedStr);
+
+
         Task task = null;
         TaskType type = TaskType.valueOf(receivedStr[1]);
+        // id, type, name, status, descripton, epic, duration, startTime
 
+        //Instant startTime = receivedStr[7].trim().equals("null") ? null : Instant.parse(receivedStr[7]);
 
         switch (type) {
 
             case TASK:
-                task = new Task(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]));
+                task = new Task(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
                 break;
 
             case SUBTASK:
-                task = new Subtask(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]));
+                task = new Subtask(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
                 ((Subtask) task).setEpicId(Integer.valueOf(receivedStr[5]));
                 break;
 
             case EPIC:
-                task = new Epic(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]));
+                task = new Epic(receivedStr[2], receivedStr[4], Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
                 break;
 
         }
@@ -230,5 +245,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.deleteEpicById(epicId);
         save();
     }
+
 
 }

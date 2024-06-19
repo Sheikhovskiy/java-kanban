@@ -1,5 +1,7 @@
 package model;
+import java.time.*;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 public class Task {
@@ -8,10 +10,32 @@ public class Task {
     private TaskStatus status;
     private int taskId;
 
-    public Task(String taskName, String taskDescription, TaskStatus status) {
+
+    protected Instant startTime;
+    protected int duration;
+    protected Instant endTime;
+
+    public Task(String taskName, String taskDescription, TaskStatus status, int id, Instant startTime, int duration) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.status = status;
+        this.taskId = id;
+
+        this.startTime = startTime;
+        this.duration = duration;
+        this.endTime = startTime.plus(duration, ChronoUnit.MINUTES);
+
+    }
+
+    // SUBTASK & EPIC
+    public Task(String taskName, String taskDescription, TaskStatus status, Instant startTime, int duration) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.status = status;
+
+        this.startTime = startTime;
+        this.duration = duration;
+        this.endTime = startTime.plus(duration, ChronoUnit.MINUTES);
     }
 
     public Task(String taskName, String taskDescription, TaskStatus status, int id) {
@@ -19,10 +43,46 @@ public class Task {
         this.taskDescription = taskDescription;
         this.status = status;
         this.taskId = id;
+
+        this.startTime = Instant.now();
+        this.duration = 0;
+        this.endTime = startTime.plus(duration, ChronoUnit.MINUTES);
+    }
+
+    public Task(String taskName, String taskDescription, TaskStatus status) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.status = status;
+
+
+        this.startTime = Instant.now();
+        this.duration = 0;
+        this.endTime = startTime.plus(duration, ChronoUnit.MINUTES);
     }
 
     public Task() {
 
+    }
+
+    public Task(String taskName, String taskDescription, int id, Instant startTime, int duration) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskId = id;
+
+        this.startTime = startTime;
+        this.duration = duration;
+
+    }
+
+    public Task(String taskName, String taskDescription, int id) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskId = id;
+    }
+
+    public Task(String taskName, String taskDescription) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
     }
 
 
@@ -31,17 +91,29 @@ public class Task {
     }
 
 
-    public String getTaskName() { return taskName; }
+    public String getTaskName() {
+        return taskName;
+    }
 
-    public void setTaskName(String taskName) { this.taskName = taskName; }
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
 
-    public String getTaskDescription() { return taskDescription; }
+    public String getTaskDescription() {
+        return taskDescription;
+    }
 
-    public void setTaskDescription(String taskDescription) { this.taskDescription = taskDescription; }
+    public void setTaskDescription(String taskDescription) {
+        this.taskDescription = taskDescription;
+    }
 
-    public TaskStatus getStatus() { return status; }
+    public TaskStatus getStatus() {
+        return status;
+    }
 
-    public void setStatus(TaskStatus status) { this.status = status; }
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
 
     public void setTaskId(int id) {
         this.taskId = id;
@@ -52,9 +124,8 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return taskId == task.taskId ;
+        return taskId == task.taskId;
     }
-
 
 
     public int getTaskId() {
@@ -68,6 +139,26 @@ public class Task {
                 " ,taskDescription='" + taskDescription + '\'' +
                 " ,status='" + status + '\'' +
                 " ,taskId=" + taskId +
+                " ,taskDuration=" + duration +
+                " ,taskStartTime=" + startTime +
                 '}';
     }
+
+
+
+    public Instant getStartTime() {
+        return this.startTime;
+    }
+
+    public Instant getEndTime() {
+        return this.endTime;
+    }
+
+    
+    public int getDuration() {
+        return this.duration;
+    }
+
+
+
 }
