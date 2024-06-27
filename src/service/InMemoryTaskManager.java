@@ -106,9 +106,6 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.remove(initial);
             add(task);
         }
-//        prioritizedTasks.remove(initial);
-//        prioritizedTasks.add(task);
-
 
         tasks.put(task.getTaskId(), task);
     }
