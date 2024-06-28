@@ -12,9 +12,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,9 +24,6 @@ public class HttpTaskManagerTasksTest {
     HttpTaskServer taskServer;
     Gson gson = HttpTaskServer.getGson();
 
-//    HttpTaskManagerTasksTest() throws IOException {
-//        taskServer = new HttpTaskServer(manager, PORT);
-//    }
 
     @BeforeEach
     public void setUp() throws IOException {

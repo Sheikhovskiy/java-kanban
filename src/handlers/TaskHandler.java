@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import service.Managers;
 import service.TaskManager;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,13 +15,12 @@ import java.time.Instant;
 import java.util.List;
 import model.Task;
 
-public class TaskHandler implements HttpHandler {
+public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
     private final Gson gson;
-    private final TaskManager taskManager;
 
     public TaskHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+        super(taskManager);
         this.gson = new GsonBuilder().registerTypeAdapter(Instant.class, new InstantAdapter()).create();
     }
 
@@ -30,27 +28,12 @@ public class TaskHandler implements HttpHandler {
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Началась обработка /tasks запроса от клиента");
 
-        String response = "";
-        String method = httpExchange.getRequestMethod();
-
-        switch (method) {
-            case "GET":
-                response = handleGetRequest(httpExchange);
-                break;
-            case "POST":
-                response = handlePostRequest(httpExchange);
-                break;
-            case "DELETE":
-                response = handleDeleteRequest(httpExchange);
-                break;
-            default:
-                response = "Некорректный метод !";
-                sendResponse(httpExchange, 405, response);
-            }
+        getClientMethod(httpExchange);
 
     }
 
-    private String handleGetRequest(HttpExchange httpExchange) throws IOException {
+    @Override
+    protected String handleGetRequest(HttpExchange httpExchange) throws IOException {
         String response;
         int taskId = checkIfTaskHasId(httpExchange);
         if (taskId != -1) {
@@ -70,7 +53,8 @@ public class TaskHandler implements HttpHandler {
         return response;
     }
 
-    private String handlePostRequest(HttpExchange httpExchange) throws IOException {
+    @Override
+    protected String handlePostRequest(HttpExchange httpExchange) throws IOException {
 
         String response;
 
@@ -111,7 +95,8 @@ public class TaskHandler implements HttpHandler {
     }
 
 
-    private String handleDeleteRequest(HttpExchange httpExchange) throws IOException {
+    @Override
+    protected String handleDeleteRequest(HttpExchange httpExchange) throws IOException {
         String response = "";
         int taskId = checkIfTaskHasId(httpExchange);
         if (taskId != -1) {
@@ -129,35 +114,35 @@ public class TaskHandler implements HttpHandler {
         return response;
     }
 
-    private int checkIfTaskHasId(HttpExchange httpExchange) {
-        String path = httpExchange.getRequestURI().getPath();
-        String[] pathSplitted = path.split("/");
-        if (pathSplitted.length > 2) {
-            try {
-                return Integer.parseInt(pathSplitted[2]);
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid task ID format: " + pathSplitted[2]);
-            }
-        }
-        return -1;
-    }
+//    private int checkIfTaskHasId(HttpExchange httpExchange) {
+//        String path = httpExchange.getRequestURI().getPath();
+//        String[] pathSplitted = path.split("/");
+//        if (pathSplitted.length > 2) {
+//            try {
+//                return Integer.parseInt(pathSplitted[2]);
+//            } catch (NumberFormatException e) {
+//                System.out.println("Invalid task ID format: " + pathSplitted[2]);
+//            }
+//        }
+//        return -1;
+//    }
 
-    private void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws IOException {
+//    private void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws IOException {
+//
+//        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
+//
+//        httpExchange.sendResponseHeaders(statusCode, responseBytes.length);
+//
+//        try (OutputStream os = httpExchange.getResponseBody()) {
+//            os.write(responseBytes);
+//        }
+//    }
 
-        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
-
-        httpExchange.sendResponseHeaders(statusCode, responseBytes.length);
-
-        try (OutputStream os = httpExchange.getResponseBody()) {
-            os.write(responseBytes);
-        }
-    }
-
-    private String toGson(Object object) {
-        return gson.toJson(object);
-    }
-
-    private Task fromGson(String json, Class<Task> clazz) {
-        return gson.fromJson(json, clazz);
-    }
+//    private String toGson(Object object) {
+//        return gson.toJson(object);
+//    }
+//
+//    private Task fromGson(String json, Class<Task> clazz) {
+//        return gson.fromJson(json, clazz);
+//    }
 }

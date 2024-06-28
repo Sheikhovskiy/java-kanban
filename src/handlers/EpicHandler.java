@@ -29,29 +29,11 @@ public class EpicHandler extends BaseHttpHandler {
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Началась обработка /epics запроса от клиента");
 
-        String method = httpExchange.getRequestMethod();
-        String response;
-
-        switch(method) {
-
-            case "GET":
-                response = handleGetRequest(httpExchange);
-                break;
-            case "POST":
-                response = handlePostRequest(httpExchange);
-                break;
-            case "DELETE":
-                response = handleDeleteRequest(httpExchange);
-                break;
-            default:
-                response = "Некорректный метод !";
-                sendResponse(httpExchange, 404, response);
-
-        }
-
+        getClientMethod(httpExchange);
     }
 
 
+    @Override
     public String handleGetRequest(HttpExchange httpExchange) throws IOException {
 
         String response = "";
@@ -107,7 +89,7 @@ public class EpicHandler extends BaseHttpHandler {
     }
 
 
-
+    @Override
     public String handlePostRequest(HttpExchange httpExchange) throws IOException {
 
         String response;
@@ -132,6 +114,7 @@ public class EpicHandler extends BaseHttpHandler {
         }
     }
 
+    @Override
     public String handleDeleteRequest(HttpExchange httpExchange) throws IOException {
 
         String response;
@@ -155,17 +138,6 @@ public class EpicHandler extends BaseHttpHandler {
             sendResponse(httpExchange, 404, response);
         }
         return  response;
-    }
-
-    private void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws  IOException {
-        byte[] responseInBytes = response.getBytes(StandardCharsets.UTF_8);
-
-        httpExchange.sendResponseHeaders(statusCode, responseInBytes.length);
-
-        try (OutputStream os = httpExchange.getResponseBody()) {
-            os.write(responseInBytes);
-        }
-
     }
 
 

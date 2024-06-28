@@ -28,27 +28,12 @@ public class SubtaskHandler extends BaseHttpHandler {
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Началась обработка /subtasks запроса от клиента");
 
-        String method = httpExchange.getRequestMethod();
-        String response;
-
-        switch(method) {
-            case "GET":
-                response = handleGetRequest(httpExchange);
-                break;
-            case "POST":
-                response = handlePostRequest(httpExchange);
-                break;
-            case "DELETE":
-                response = handleDeleteRequest(httpExchange);
-                break;
-            default:
-                response = "Некорректный метод !";
-                sendResponse(httpExchange,405, response);
-        }
+        getClientMethod(httpExchange);
 
     }
 
 
+    @Override
     public String handleGetRequest(HttpExchange httpExchange) throws IOException {
 
         String response;
@@ -78,6 +63,7 @@ public class SubtaskHandler extends BaseHttpHandler {
     }
 
 
+    @Override
     public String handlePostRequest(HttpExchange httpExchange) throws IOException {
 
         String response;
@@ -126,6 +112,7 @@ public class SubtaskHandler extends BaseHttpHandler {
         }
     }
 
+    @Override
     public String handleDeleteRequest(HttpExchange httpExchange) throws IOException {
 
         String response;
@@ -148,14 +135,5 @@ public class SubtaskHandler extends BaseHttpHandler {
         return "Вы указали неверный или несуществующий id";
     }
 
-    private void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws IOException {
-        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
-
-        httpExchange.sendResponseHeaders(statusCode, responseBytes.length);
-
-        try (OutputStream os = httpExchange.getResponseBody()) {
-            os.write(responseBytes);
-        }
-    }
 
 }

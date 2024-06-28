@@ -7,13 +7,14 @@ import com.sun.net.httpserver.HttpHandler;
 import adapters.InstantAdapter;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 import service.*;
 
 
-public class BaseHttpHandler implements HttpHandler {
+public abstract class BaseHttpHandler implements HttpHandler {
 
     TaskManager taskManager = Managers.getDefaultTaskManager();
     HistoryManager historyManager = Managers.getDefaultHistory();
@@ -48,6 +49,61 @@ public class BaseHttpHandler implements HttpHandler {
         httpExchange.sendResponseHeaders(409, resp.length);
         httpExchange.getResponseBody().write(resp);
         httpExchange.close();
+    }
+
+
+    public void getClientMethod(HttpExchange httpExchange) throws IOException {
+
+        String response;
+
+        String method = httpExchange.getRequestMethod();
+        METHOD_TYPE methodType = METHOD_TYPE.valueOf(method);
+
+
+        switch (methodType) {
+            case METHOD_TYPE.GET:
+                response = handleGetRequest(httpExchange);
+                break;
+            case METHOD_TYPE.POST:
+                response = handlePostRequest(httpExchange);
+                break;
+            case METHOD_TYPE.DELETE:
+                response = handleDeleteRequest(httpExchange);
+                break;
+            default:
+                response = "METHOD_NOT_ALLOWED";
+                sendResponse(httpExchange, 405, response);
+        }
+
+    }
+
+    protected void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws IOException {
+
+        byte[] responseInBytes = response.getBytes();
+
+        httpExchange.sendResponseHeaders(statusCode, responseInBytes.length);
+
+        try (OutputStream os = httpExchange.getResponseBody()) {
+            os.write(responseInBytes);
+        }
+    }
+
+    protected  String handleDeleteRequest(HttpExchange httpExchange) throws IOException {
+        String response = "METHOD_NOT_ALLOWED";
+        sendResponse(httpExchange, 405, response);
+        return response;
+    }
+
+    protected  String handlePostRequest(HttpExchange httpExchange) throws IOException {
+        String response = "METHOD_NOT_ALLOWED";
+        sendResponse(httpExchange, 405, response);
+        return response;
+    }
+
+    protected  String handleGetRequest(HttpExchange httpExchange) throws IOException {
+        String response = "METHOD_NOT_ALLOWED";
+        sendResponse(httpExchange, 405, response);
+        return response;
     }
 
 
@@ -95,6 +151,13 @@ public class BaseHttpHandler implements HttpHandler {
             System.out.println(exception.getMessage());
         }
         return receivedId;
+    }
+
+    public enum METHOD_TYPE  {
+        GET,
+        POST,
+        DELETE;
+
     }
 
 }

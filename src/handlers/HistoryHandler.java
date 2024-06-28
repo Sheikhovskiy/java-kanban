@@ -14,7 +14,6 @@ import java.util.List;
 
 public class HistoryHandler extends BaseHttpHandler {
 
-
     private final Gson gson;
 
     public HistoryHandler(TaskManager taskManager) {
@@ -22,27 +21,16 @@ public class HistoryHandler extends BaseHttpHandler {
         this.gson = new Gson();
     }
 
-    HistoryManager historyManager = Managers.getDefaultHistory();
-
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Началась обработка /tasks запроса от клиента");
 
-        List<Task> history = historyManager.getHistory();
-        String response;
-
-        String method = httpExchange.getRequestMethod();
-
-        if (method.equals("GET")) {
-            response = handleGetRequest(httpExchange);
-        } else {
-            response = "Некорректный метод !";
-            sendNotFound(httpExchange, response);
-        }
+        getClientMethod(httpExchange);
 
     }
 
 
+    @Override
     public String handleGetRequest(HttpExchange httpExchange) throws IOException {
 
         String response;
@@ -58,20 +46,5 @@ public class HistoryHandler extends BaseHttpHandler {
         }
         return response;
     }
-
-    private void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws IOException {
-
-        byte[] responseInBytes = response.getBytes(StandardCharsets.UTF_8);
-
-        httpExchange.sendResponseHeaders(statusCode, responseInBytes.length);
-
-        try (OutputStream os = httpExchange.getResponseBody()) {
-            os.write(responseInBytes);
-        }
-
-    }
-
-
-
 
 }

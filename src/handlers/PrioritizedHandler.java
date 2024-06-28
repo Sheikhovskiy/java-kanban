@@ -22,31 +22,15 @@ public class PrioritizedHandler extends BaseHttpHandler {
     }
 
 
-    TaskManager taskManager = Managers.getDefaultTaskManager();
-
-
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Началась обработка /prioritized запроса от клиента");
 
-        String response;
-
-        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
-
-
-        String method = httpExchange.getRequestMethod();
-
-        if (method.equals("GET")) {
-            response = handleGetRequest(httpExchange);
-        } else {
-            response = "Некорректный метод !";
-            sendResponse(httpExchange, 404, response);
-        }
-
+        getClientMethod(httpExchange);
     }
 
 
-
+    @Override
     public String handleGetRequest(HttpExchange httpExchange) throws IOException {
 
         String response;
@@ -63,17 +47,6 @@ public class PrioritizedHandler extends BaseHttpHandler {
 
         return response;
 
-    }
-
-    private void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws IOException {
-
-        byte[] responseInBytes = response.getBytes(StandardCharsets.UTF_8);
-
-        httpExchange.sendResponseHeaders(statusCode, responseInBytes.length);
-
-        try (OutputStream os = httpExchange.getResponseBody()) {
-            os.write(responseInBytes);
-        }
     }
 
 }
