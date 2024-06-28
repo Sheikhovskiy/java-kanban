@@ -35,8 +35,7 @@ public class HttpTaskManagerTasksTest {
         manager.deleteAllTasks();
         manager.deleteAllSubtasks();
         manager.deleteAllEpics();
-        taskServer = new HttpTaskServer(manager, PORT);  // Переместить создание сервера сюда, если это необходимо
-        System.out.println("test");
+        taskServer = new HttpTaskServer(manager, PORT);
         taskServer.start();
     }
 
@@ -50,18 +49,24 @@ public class HttpTaskManagerTasksTest {
     public void shouldAddTask() throws IOException, InterruptedException {
 
         Task task = new Task("Test 2", "Testing task 2", TaskStatus.NEW, 2, Instant.now(), 5);
+
         // конвертируем её в JSON
         String taskJson = gson.toJson(task);
+        System.out.println(taskJson);
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks");
-        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+        HttpRequest request = HttpRequest.newBuilder().uri(url)
+                .version(HttpClient.Version.HTTP_1_1)
+                .POST(HttpRequest.BodyPublishers.ofString(taskJson))
+                .header("Content-Type", "application/json")
+                .build();
 
         // вызываем рест, отвечающий за создание задач
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         // проверяем код ответа
-        assertEquals(200, response.statusCode());
+        assertEquals(201, response.statusCode());
 
         // проверяем, что создалась одна задача с корректным именем
         List<Task> tasksFromManager = manager.printListOfAllTasks();

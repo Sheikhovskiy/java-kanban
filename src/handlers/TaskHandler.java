@@ -1,43 +1,37 @@
 package handlers;
 
 import OwnExceptions.NotFoundException;
+import adapters.InstantAdapter;
 import com.google.gson.Gson;
-import com.sun.net.httpserver.Headers;
+import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
-import handlers.BaseHttpHandler;
+import com.sun.net.httpserver.HttpHandler;
 import service.Managers;
 import service.TaskManager;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
-
 import model.Task;
 
-public class TaskHandler extends BaseHttpHandler {
+public class TaskHandler implements HttpHandler {
 
     private final Gson gson;
     private final TaskManager taskManager;
 
     public TaskHandler(TaskManager taskManager) {
-        super(taskManager);
         this.taskManager = taskManager;
-        this.gson = new Gson();
+        this.gson = new GsonBuilder().registerTypeAdapter(Instant.class, new InstantAdapter()).create();
     }
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Началась обработка /tasks запроса от клиента");
 
-        TaskManager taskManager = Managers.getDefaultTaskManager();
         String response = "";
         String method = httpExchange.getRequestMethod();
-        System.out.println(method);
-
-        httpExchange.getRequestHeaders().forEach((key, value) ->
-                System.out.println("Header: " + key + " Value: " + value));
 
         switch (method) {
             case "GET":
@@ -45,169 +39,125 @@ public class TaskHandler extends BaseHttpHandler {
                 break;
             case "POST":
                 response = handlePostRequest(httpExchange);
-                System.out.println("Response");
                 break;
             case "DELETE":
                 response = handleDeleteRequest(httpExchange);
                 break;
             default:
                 response = "Некорректный метод !";
-                sendNotFound(httpExchange, response);
-
-        }
-
-
-
-        if (response.isEmpty()) {
-            httpExchange.sendResponseHeaders(404, -1);
-        } else {
-            byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
-            httpExchange.sendResponseHeaders(200, responseBytes.length);
-            try (OutputStream os = httpExchange.getResponseBody()) {
-                os.write(responseBytes);
+                sendResponse(httpExchange, 405, response);
             }
-        }
-    }
-
-    public String handleGetRequest(HttpExchange httpExchange) throws IOException {
-
-        String response = "";
-        TaskManager taskManager = Managers.getDefaultTaskManager();
-        int taskId = checkIfTaskHasId(httpExchange);
-
-
-
-        if (taskId != -1) {
-            try {
-                Task task = taskManager.getTaskPerId(taskId);
-                if (task != null) {
-                    response = toGson(task);
-                    sendText(httpExchange, response);
-                    //httpExchange.sendResponseHeaders(200, response.getBytes().length);
-                } else {
-                    response = "Задача с таким номером не существует";
-                    sendNotFound(httpExchange, response);
-                    //httpExchange.sendResponseHeaders(404, response.getBytes().length);
-                }
-
-            } catch (NullPointerException exc) {
-                response = "Задача с таким номером не существует";
-                sendNotFound(httpExchange, response);
-                //httpExchange.sendResponseHeaders(404, response.getBytes().length);
-            }
-        } else {
-            List<Task> tasks = taskManager.printListOfAllTasks();
-            response = toGson(tasks);
-
-            sendText(httpExchange, response);
-            //httpExchange.sendResponseHeaders(200, response.getBytes().length);
-
-        }
-        return response;
 
     }
 
-
-    public String handlePostRequest(HttpExchange httpExchange) throws IOException {
-
-        InputStream bodyInputStream = httpExchange.getRequestBody();
-        String body = new String(bodyInputStream.readAllBytes(), StandardCharsets.UTF_8);
-
-        Task taskUser = fromGson(body, Task.class);
-
-        System.out.println(taskUser);
-
+    private String handleGetRequest(HttpExchange httpExchange) throws IOException {
         String response;
         int taskId = checkIfTaskHasId(httpExchange);
-
         if (taskId != -1) {
-            taskUser.setTaskId(taskId);
-            try {
-                taskManager.taskUpdate(taskUser);
-                response = "Задача успешно обновлена";
-                httpExchange.sendResponseHeaders(200, response.getBytes().length);
-            } catch (NotFoundException exception) {
-                response = "Задача не найдена";
-                httpExchange.sendResponseHeaders(404, response.getBytes(StandardCharsets.UTF_8).length);
-            } catch (IllegalStateException exception) {
-                response = "id Задачи пересекаются с уже существующей";
-                httpExchange.sendResponseHeaders(409, response.getBytes(StandardCharsets.UTF_8).length);
+            Task task = taskManager.getTaskPerId(taskId);
+            if (task != null) {
+                response = toGson(task);
+                sendResponse(httpExchange, 200, response);
+            } else {
+                response = "Задача с таким номером не существует";
+                sendResponse(httpExchange, 404, response);
             }
         } else {
-            try {
-                taskManager.createTask(taskUser);
-                response = "Задача успешно создана!";
-                httpExchange.sendResponseHeaders(201, response.getBytes(StandardCharsets.UTF_8).length);
-            } catch (IllegalStateException exception) {
-                response = "id Задачи пересекаются с уже существующей";
-                httpExchange.sendResponseHeaders(409, response.getBytes(StandardCharsets.UTF_8).length);
-            }
+            List<Task> tasksFound = taskManager.printListOfAllTasks();
+            response = toGson(tasksFound);
+            sendResponse(httpExchange, 200, response);
         }
         return response;
     }
 
+    private String handlePostRequest(HttpExchange httpExchange) throws IOException {
 
-
-    public String handleDeleteRequest(HttpExchange httpExchange) throws IOException {
-
-        String response = "";
-        TaskManager taskManager = Managers.getDefaultTaskManager();
+        String response;
 
         int taskId = checkIfTaskHasId(httpExchange);
 
-        if (taskId != -1) {
+        try (InputStream bodyInputStream = httpExchange.getRequestBody()) {
+            String body = new String(bodyInputStream.readAllBytes(), StandardCharsets.UTF_8);
 
+            Task taskUser = fromGson(body, Task.class);
+
+            if (taskId != -1) {
+                taskUser.setTaskId(taskId);
+                try {
+                    taskManager.taskUpdate(taskUser);
+                    response = "Задача успешно обновлена";
+                    sendResponse(httpExchange, 200, response); // Возвращаем 200 при обновлении
+                } catch (NotFoundException exception) {
+                    response = "Задача не найдена";
+                    sendResponse(httpExchange, 404, response);
+                } catch (IllegalStateException exception) {
+                    response = "id Задачи пересекаются с уже существующей";
+                    sendResponse(httpExchange, 409, response);
+                }
+            } else {
+
+                try {
+                    taskManager.createTask(taskUser);
+                    response = "Задача успешно создана!";
+                    sendResponse(httpExchange, 201, response); // Возвращаем 201 при создании
+                } catch (IllegalStateException exception) {
+                    response = "id Задачи пересекаются с уже существующей";
+                    sendResponse(httpExchange, 409, response);
+                }
+            }
+
+            return response;
+        }
+    }
+
+
+    private String handleDeleteRequest(HttpExchange httpExchange) throws IOException {
+        String response = "";
+        int taskId = checkIfTaskHasId(httpExchange);
+        if (taskId != -1) {
             try {
                 taskManager.deleteTaskById(taskId);
                 response = "Задача успешно удалена !";
-
-                sendText(httpExchange, response);
-                //httpExchange.sendResponseHeaders(200, response.getBytes().length);
-
+                sendResponse(httpExchange, 200, response);
             } catch (NotFoundException exception) {
                 response = "Задача с таким id не найдена";
-
-                sendNotFound(httpExchange, response);
-                //httpExchange.sendResponseHeaders(404, response.getBytes().length);
+                sendResponse(httpExchange, 404, response);
             }
+        } else {
+            sendResponse(httpExchange, 400, "Некорректный id задачи");
         }
-
         return response;
     }
 
-/*    public static int checkIfTaskHasId(HttpExchange httpExchange) throws IOException {
-
-        int receivedId = -1;
-
+    private int checkIfTaskHasId(HttpExchange httpExchange) {
         String path = httpExchange.getRequestURI().getPath();
         String[] pathSplitted = path.split("/");
-
-        if (pathSplitted[2] != null) {
-
+        if (pathSplitted.length > 2) {
             try {
-                receivedId = Integer.parseInt(pathSplitted[2]);
-
-            } catch (NumberFormatException exc) {
-                httpExchange.sendResponseHeaders(400, 0);
-                System.out.println(exc.getMessage());
+                return Integer.parseInt(pathSplitted[2]);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid task ID format: " + pathSplitted[2]);
             }
         }
-        return receivedId;
-    }*/
+        return -1;
+    }
 
+    private void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws IOException {
 
+        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
 
+        httpExchange.sendResponseHeaders(statusCode, responseBytes.length);
 
+        try (OutputStream os = httpExchange.getResponseBody()) {
+            os.write(responseBytes);
+        }
+    }
 
+    private String toGson(Object object) {
+        return gson.toJson(object);
+    }
 
-
+    private Task fromGson(String json, Class<Task> clazz) {
+        return gson.fromJson(json, clazz);
+    }
 }
-
-
-
-
-
-
-
-
-

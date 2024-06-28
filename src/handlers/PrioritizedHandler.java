@@ -2,13 +2,13 @@ package handlers;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import handlers.BaseHttpHandler;
 import model.Task;
 import service.Managers;
 import service.TaskManager;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class PrioritizedHandler extends BaseHttpHandler {
@@ -40,16 +40,11 @@ public class PrioritizedHandler extends BaseHttpHandler {
             response = handleGetRequest(httpExchange);
         } else {
             response = "Некорректный метод !";
-            sendNotFound(httpExchange, response);
+            sendResponse(httpExchange, 404, response);
         }
 
-        if (!response.isEmpty()) {
-            try (OutputStream os = httpExchange.getResponseBody()) {
-                os.write(response.getBytes());
-            }
-
-        }
     }
+
 
 
     public String handleGetRequest(HttpExchange httpExchange) throws IOException {
@@ -59,18 +54,26 @@ public class PrioritizedHandler extends BaseHttpHandler {
         try {
             List<Task> prioritizedTask = taskManager.getPrioritizedTasks();
             response = toGson(prioritizedTask);
-            sendText(httpExchange, response);
+            sendResponse(httpExchange, 200, response);
 
         } catch (Throwable exception) {
             response = exception.getMessage();
-            sendNotFound(httpExchange, response);
+            sendResponse(httpExchange, 404, response);
         }
 
         return response;
 
     }
 
+    private void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws IOException {
 
+        byte[] responseInBytes = response.getBytes(StandardCharsets.UTF_8);
 
+        httpExchange.sendResponseHeaders(statusCode, responseInBytes.length);
+
+        try (OutputStream os = httpExchange.getResponseBody()) {
+            os.write(responseInBytes);
+        }
+    }
 
 }

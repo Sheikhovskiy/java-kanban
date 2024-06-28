@@ -2,7 +2,6 @@ package handlers;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import handlers.BaseHttpHandler;
 import model.Task;
 import service.HistoryManager;
 import service.Managers;
@@ -10,6 +9,7 @@ import service.TaskManager;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class HistoryHandler extends BaseHttpHandler {
@@ -40,13 +40,6 @@ public class HistoryHandler extends BaseHttpHandler {
             sendNotFound(httpExchange, response);
         }
 
-        if (!response.isEmpty()) {
-
-            try (OutputStream os = httpExchange.getResponseBody()) {
-                os.write(response.getBytes());
-            }
-        }
-
     }
 
 
@@ -57,14 +50,28 @@ public class HistoryHandler extends BaseHttpHandler {
         try {
             List<Task> tasksHistory = taskManager.getHistory();
             response = toGson(tasksHistory);
-            sendText(httpExchange, response);
+            sendResponse(httpExchange, 200, response);
 
         } catch (Throwable exception) {
             response = exception.getMessage();
-            sendText(httpExchange, response);
+            sendResponse(httpExchange, 404, response);
         }
         return response;
     }
+
+    private void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws IOException {
+
+        byte[] responseInBytes = response.getBytes(StandardCharsets.UTF_8);
+
+        httpExchange.sendResponseHeaders(statusCode, responseInBytes.length);
+
+        try (OutputStream os = httpExchange.getResponseBody()) {
+            os.write(responseInBytes);
+        }
+
+    }
+
+
 
 
 }

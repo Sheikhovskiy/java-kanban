@@ -43,18 +43,10 @@ public class SubtaskHandler extends BaseHttpHandler {
                 break;
             default:
                 response = "Некорректный метод !";
-                sendNotFound(httpExchange, response);
-        }
-
-        if (!response.isEmpty()) {
-            try (OutputStream os = httpExchange.getResponseBody()) {
-                os.write(response.getBytes());
-            }
+                sendResponse(httpExchange,405, response);
         }
 
     }
-
-
 
 
     public String handleGetRequest(HttpExchange httpExchange) throws IOException {
@@ -66,19 +58,20 @@ public class SubtaskHandler extends BaseHttpHandler {
 
             try {
                 Subtask subtaskFound = taskManager.getSubtaskPerId(subtaskId);
+
                 response = toGson(subtaskFound);
+                sendResponse(httpExchange, 200, response);
 
             } catch (NotFoundException exception) {
                 response = "Подзадача с таким id не найдена";
-                sendNotFound(httpExchange, response);
+                sendResponse(httpExchange, 404, response);
             }
 
         } else {
-
             List<Task> subtaskListFound = taskManager.printListOfAllSubtasks();
-            response = toGson(subtaskListFound);
 
-            sendText(httpExchange, response);
+            response = toGson(subtaskListFound);
+            sendResponse(httpExchange, 200, response);
 
         }
         return response;
@@ -88,48 +81,49 @@ public class SubtaskHandler extends BaseHttpHandler {
     public String handlePostRequest(HttpExchange httpExchange) throws IOException {
 
         String response;
+
         int subtaskId = checkIfTaskHasId(httpExchange);
-        InputStream inputBodyStream = httpExchange.getRequestBody();
-        String body = new String(inputBodyStream.readAllBytes(), StandardCharsets.UTF_8);
 
-        Gson gson = new Gson();
+        try (InputStream inputBodyStream = httpExchange.getRequestBody()) {
+            String body = new String(inputBodyStream.readAllBytes(), StandardCharsets.UTF_8);
 
-        Subtask userSubtask = fromGson(body, Subtask.class);
+            Gson gson = new Gson();
+
+            Subtask userSubtask = fromGson(body, Subtask.class);
 
 
-        if (subtaskId != -1) {
-             userSubtask.setTaskId(subtaskId);
+            if (subtaskId != -1) {
+                userSubtask.setTaskId(subtaskId);
 
-            try {
-                taskManager.subtaskUpdate(userSubtask);
-                response = "Подзадача успешно обновлена";
-                sendText(httpExchange, response);
+                try {
+                    taskManager.subtaskUpdate(userSubtask);
+                    response = "Подзадача успешно обновлена";
+                    sendResponse(httpExchange, 201, response);
 
-            } catch (NotFoundException exception) {
-                response = "Подзадача не найдена";
-                sendNotFound(httpExchange, response);
-            } catch (IllegalStateException exception) {
-                response = "id Подзадачи пересекаются с уже существующей";
-                sendInteractions(httpExchange, response);
+                } catch (NotFoundException exception) {
+                    response = "Подзадача не найдена";
+                    sendResponse(httpExchange, 404, response);
+                } catch (IllegalStateException exception) {
+                    response = "id Подзадачи пересекаются с уже существующей";
+                    sendResponse(httpExchange, 406, response);
+                }
+
+
+            } else {
+
+                try {
+                    taskManager.createSubtask(userSubtask);
+                    response = "Подзадача успешно создана";
+                    sendResponse(httpExchange, 200, response);
+
+                } catch (IllegalStateException exception) {
+                    response = "id Подзадачи пересекаются с уже существующей";
+                    sendResponse(httpExchange, 406, response);
+                }
             }
 
-
-
-        } else {
-
-            try {
-                taskManager.createSubtask(userSubtask);
-                response = "Подзадача успешно создана";
-                sendText(httpExchange, response);
-
-            } catch (IllegalStateException exception) {
-                response = "id Подзадачи пересекаются с уже существующей";
-                sendInteractions(httpExchange, response);
-            }
-
+            return response;
         }
-        return response;
-
     }
 
     public String handleDeleteRequest(HttpExchange httpExchange) throws IOException {
@@ -143,32 +137,25 @@ public class SubtaskHandler extends BaseHttpHandler {
             try {
                 taskManager.deleteSubtaskById(substaskId);
                 response = "Подзадача успешно удалена";
-                sendText(httpExchange, response);
+                sendResponse(httpExchange, 200, response);
 
 
             } catch (NotFoundException exception) {
                 response = "Подзадача не найдена";
-                sendNotFound(httpExchange, response);
-
+                sendResponse(httpExchange, 404, response);
             }
         }
         return "Вы указали неверный или несуществующий id";
     }
 
+    private void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws IOException {
+        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
 
+        httpExchange.sendResponseHeaders(statusCode, responseBytes.length);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        try (OutputStream os = httpExchange.getResponseBody()) {
+            os.write(responseBytes);
+        }
+    }
 
 }

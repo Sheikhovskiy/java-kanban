@@ -19,14 +19,14 @@ public class HttpTaskServer {
 
     public static void main(String[] args) throws IOException {
 
-/*        try {
+        try {
             TaskManager manager = new InMemoryTaskManager();
             HttpTaskServer server = new HttpTaskServer(manager, PORT);
-            //server.start();
+            server.start();
 
         } catch (IOException exception) {
             exception.printStackTrace();
-        }*/
+        }
 
     }
 

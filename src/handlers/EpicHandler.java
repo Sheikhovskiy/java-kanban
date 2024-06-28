@@ -45,14 +45,8 @@ public class EpicHandler extends BaseHttpHandler {
                 break;
             default:
                 response = "Некорректный метод !";
-                sendNotFound(httpExchange, response);
+                sendResponse(httpExchange, 404, response);
 
-        }
-
-        if (!response.isEmpty()) {
-            try (OutputStream os = httpExchange.getResponseBody()) {
-                os.write(response.getBytes());
-            }
         }
 
     }
@@ -70,8 +64,9 @@ public class EpicHandler extends BaseHttpHandler {
             String path = httpExchange.getRequestURI().getPath();
             String[] pathSplitted = path.split("/");
 
-            if (pathSplitted[3] != null) {
 
+
+            if (pathSplitted.length > 3 && pathSplitted[3] != null) {
                 try {
                     receivedText = String.valueOf(pathSplitted[3]);
 
@@ -84,26 +79,27 @@ public class EpicHandler extends BaseHttpHandler {
                     Epic epicFound = taskManager.getEpicPerId(epicId);
                     List<Subtask> epicSubtasksFound = taskManager.getSubtaskPerEpic(epicFound);
                     response = toGson(epicSubtasksFound);
-                    sendText(httpExchange, response);
+                    sendResponse(httpExchange, 200, response);
 
 
                 }
             } else {
-
                 try {
                     Epic epicFound = taskManager.getEpicPerId(epicId);
-                    response = toGson(epicFound);
-                    sendText(httpExchange, response);
+                    List<Subtask> subtaskListOfEpic = taskManager.getSubtaskPerEpic(epicFound);
+                    response = toGson(subtaskListOfEpic);
+                    sendResponse(httpExchange, 200, response);
+
                 } catch (NotFoundException exception) {
                     response = "Эпик с таким id не найден";
-                    sendNotFound(httpExchange, response);
+                    sendResponse(httpExchange, 404, response);
                 }
             }
 
         } else {
             List<Task> epicListFound = taskManager.printListOfAllEpics();
             response = toGson(epicListFound);
-            sendText(httpExchange, response);
+            sendResponse(httpExchange, 200, response);
 
         }
         return response;
@@ -112,30 +108,29 @@ public class EpicHandler extends BaseHttpHandler {
 
 
 
-
     public String handlePostRequest(HttpExchange httpExchange) throws IOException {
 
         String response;
 
-        InputStream inputBodyStream = httpExchange.getRequestBody();
-        String body = new String(inputBodyStream.readAllBytes(), StandardCharsets.UTF_8);
+        try (InputStream inputBodyStream = httpExchange.getRequestBody()) {
+            String body = new String(inputBodyStream.readAllBytes(), StandardCharsets.UTF_8);
 
-        Gson gson = new Gson();
+            Gson gson = new Gson();
 
-        Epic epic = fromGson(body, Epic.class);
+            Epic epic = fromGson(body, Epic.class);
 
-        try {
-            taskManager.createEpic(epic);
-            response = "Эпик успешно создан";
-            sendText(httpExchange, response);
+            try {
+                taskManager.createEpic(epic);
+                response = "Эпик успешно создан";
+                sendResponse(httpExchange, 201, response);
 
-        } catch (IllegalStateException exception) {
-            response = "id Подзадачи пересекаются с уже существующей";
-            sendInteractions(httpExchange, response);
+            } catch (IllegalStateException exception) {
+                response = "id Подзадачи пересекаются с уже существующей";
+                sendResponse(httpExchange, 406, response);
+            }
+            return response;
         }
-        return  response;
     }
-
 
     public String handleDeleteRequest(HttpExchange httpExchange) throws IOException {
 
@@ -147,19 +142,31 @@ public class EpicHandler extends BaseHttpHandler {
             try {
                 taskManager.deleteEpicById(epicId);
                 response = "Эпик с id " + epicId + " успешно удалён !";
-                sendText(httpExchange, response);
+                sendResponse(httpExchange, 200, response);
 
             } catch (NotFoundException exception) {
                 response = "Эпик с таким id не найден";
-                sendNotFound(httpExchange, response);
+                sendResponse(httpExchange, 404, response);
 
             }
 
         } else {
             response = "Вы не указали id Эпика";
-            sendNotFound(httpExchange, response);
+            sendResponse(httpExchange, 404, response);
         }
         return  response;
     }
+
+    private void sendResponse(HttpExchange httpExchange, int statusCode, String response) throws  IOException {
+        byte[] responseInBytes = response.getBytes(StandardCharsets.UTF_8);
+
+        httpExchange.sendResponseHeaders(statusCode, responseInBytes.length);
+
+        try (OutputStream os = httpExchange.getResponseBody()) {
+            os.write(responseInBytes);
+        }
+
+    }
+
 
 }

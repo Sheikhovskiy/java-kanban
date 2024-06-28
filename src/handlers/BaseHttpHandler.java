@@ -80,55 +80,21 @@ public class BaseHttpHandler implements HttpHandler {
         String path = httpExchange.getRequestURI().getPath();
         String[] pathSplitted = path.split("/");
 
-        if (pathSplitted[2] != null) {
+        try {
+            if (pathSplitted.length > 2 && pathSplitted[2] != null) {
 
-            try {
-                receivedId = Integer.parseInt(pathSplitted[2]);
+                try {
+                    receivedId = Integer.parseInt(pathSplitted[2]);
 
-            } catch (NumberFormatException exc) {
-                httpExchange.sendResponseHeaders(400, 0);
-                System.out.println(exc.getMessage());
+                } catch (NumberFormatException exc) {
+                    httpExchange.sendResponseHeaders(400, 0);
+                    System.out.println(exc.getMessage());
+                }
             }
+        } catch (Throwable exception) {
+            System.out.println(exception.getMessage());
         }
         return receivedId;
     }
-
-
-
-
-
-
-
-
-
-
-
-/*    class LocalDateAdapter extends TypeAdapter<LocalDateTime> {
-
-        private final DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-        @Override
-        public void write(JsonWriter jsonWriter, LocalDateTime localDateTime) throws IOException {
-            jsonWriter.value(localDateTime.format(format));
-        }
-
-        @Override
-        public LocalDateTime read(JsonReader jsonReader) throws IOException {
-            return LocalDateTime.parse(jsonReader.nextString(), format);
-        }
-    }*/
-
-
-
-
-/*    protected static void writeResponse(HttpExchange httpExchange, String responseString, int responseCode) throws IOException {
-
-        try (OutputStream os = httpExchange.getResponseBody()) {
-            httpExchange.sendResponseHeaders(responseCode, 0);
-            os.write(responseString.getBytes(StandardCharsets.UTF_8));
-        }
-        httpExchange.close();
-
-    }*/
-
 
 }
