@@ -152,7 +152,6 @@ public class Task {
         return this.endTime;
     }
 
-    
     public int getDuration() {
         return this.duration;
     }
