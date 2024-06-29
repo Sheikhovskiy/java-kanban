@@ -205,6 +205,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.deleteAllTasks();
         save();
     }
+
     @Override
     public void deleteAllSubtasks() {
         super.deleteAllSubtasks();
