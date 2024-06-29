@@ -28,6 +28,7 @@ public class Epic extends Task {
     public Epic() {
 
     }
+
     public ArrayList<Integer> getSubtasks() {
         return subtasksId;
     }
