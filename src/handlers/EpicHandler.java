@@ -1,9 +1,8 @@
 package handlers;
 
-import OwnExceptions.NotFoundException;
+import ownexceptions.NotFoundException;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import handlers.BaseHttpHandler;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -11,7 +10,6 @@ import service.TaskManager;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 

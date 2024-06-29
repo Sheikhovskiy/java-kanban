@@ -1,6 +1,6 @@
 package service;
 
-import OwnExceptions.NotFoundException;
+import ownexceptions.NotFoundException;
 import model.*;
 
 import java.util.*;

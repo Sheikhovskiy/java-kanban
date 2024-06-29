@@ -1,6 +1,6 @@
 package handlers;
 
-import OwnExceptions.NotFoundException;
+import ownexceptions.NotFoundException;
 import adapters.InstantAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,7 +9,6 @@ import com.sun.net.httpserver.HttpHandler;
 import service.TaskManager;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
