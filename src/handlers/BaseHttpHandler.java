@@ -57,17 +57,17 @@ public abstract class BaseHttpHandler implements HttpHandler {
         String response;
 
         String method = httpExchange.getRequestMethod();
-        METHOD_TYPE methodType = METHOD_TYPE.valueOf(method);
+        MethodType methodType = MethodType.valueOf(method);
 
 
         switch (methodType) {
-            case METHOD_TYPE.GET:
+            case MethodType.GET:
                 response = handleGetRequest(httpExchange);
                 break;
-            case METHOD_TYPE.POST:
+            case MethodType.POST:
                 response = handlePostRequest(httpExchange);
                 break;
-            case METHOD_TYPE.DELETE:
+            case MethodType.DELETE:
                 response = handleDeleteRequest(httpExchange);
                 break;
             default:
@@ -153,7 +153,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
         return receivedId;
     }
 
-    public enum METHOD_TYPE  {
+    public enum MethodType  {
         GET,
         POST,
         DELETE;
