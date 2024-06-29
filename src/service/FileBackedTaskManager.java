@@ -170,33 +170,35 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     static Task fromString(String value) {
-        String[] parts = value.split(",");
-        int id = Integer.parseInt(parts[0].trim());
-        TaskType type = TaskType.valueOf(parts[1].trim());
-        String name = parts[2].trim();
-        TaskStatus status = TaskStatus.valueOf(parts[3].trim());
-        String description = parts[4].trim();
-        int duration = Integer.parseInt(parts[6].trim());
-        Instant startTime = Instant.parse(parts[7].trim());
+        String[] receivedStr = value.split(",");
+
+//        System.out.println(receivedStr);
+
+
         Task task = null;
+        TaskType type = TaskType.valueOf(receivedStr[1]);
+        // id, type, name, status, descripton, epic, duration, startTime
+
+        //Instant startTime = receivedStr[7].trim().equals("null") ? null : Instant.parse(receivedStr[7]);
 
         switch (type) {
+
             case TASK:
-                task = new Task(name, description, status, id, startTime, duration);
+                task = new Task(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
                 break;
+
             case SUBTASK:
-                int epicId = Integer.parseInt(parts[5].trim());
-                task = new Subtask(name, description, status, id, startTime, duration);
-                ((Subtask) task).setEpicId(epicId);
+                task = new Subtask(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
+                ((Subtask) task).setEpicId(Integer.valueOf(receivedStr[5]));
                 break;
+
             case EPIC:
-                task = new Epic(name, description, id, startTime, duration);
+                task = new Epic(receivedStr[2], receivedStr[4], Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
                 break;
+
         }
         return task;
     }
-
-
 
     @Override
     public void deleteAllTasks() {
