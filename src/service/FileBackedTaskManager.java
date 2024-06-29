@@ -2,7 +2,6 @@ package service;
 import model.*;
 import java.io.*;
 import java.nio.file.Files;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.time.*;
 
@@ -171,45 +170,35 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     static Task fromString(String value) {
-        String[] parts = value.split(",");
-        if (parts.length < 7) {
-            System.err.println("Некорректный формат строки: " + value);
-            return null;
-        }
+        String[] receivedStr = value.split(",");
 
-        try {
-            int id = Integer.parseInt(parts[0].trim());
-            TaskType type = TaskType.valueOf(parts[1].trim());
-            String name = parts[2].trim();
-            TaskStatus status = TaskStatus.valueOf(parts[3].trim());
-            String description = parts[4].trim();
-            int epicId = type == TaskType.SUBTASK ? Integer.parseInt(parts[5].trim()) : -1;
-            int duration = Integer.parseInt(parts[6].trim());
-            Instant startTime = Instant.parse(parts[7].trim());
+//        System.out.println(receivedStr);
 
-            switch (type) {
-                case TASK:
-                    return new Task(name, description, status, id, startTime, duration);
-                case SUBTASK:
-                    Subtask subtask = new Subtask(name, description, status, id, startTime, duration);
-                    subtask.setEpicId(epicId);
-                    return subtask;
-                case EPIC:
-                    return new Epic(name, description, id, startTime, duration);
-                default:
-                    throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
-            }
-        } catch (NumberFormatException | DateTimeParseException e) {
-            System.err.println("Ошибка при разборе числовых значений или даты: " + e.getMessage());
-            return null;
-        } catch (IllegalArgumentException e) {
-            System.err.println("Ошибка в данных: " + e.getMessage());
-            return null;
+
+        Task task = null;
+        TaskType type = TaskType.valueOf(receivedStr[1]);
+        // id, type, name, status, descripton, epic, duration, startTime
+
+        //Instant startTime = receivedStr[7].trim().equals("null") ? null : Instant.parse(receivedStr[7]);
+
+        switch (type) {
+
+            case TASK:
+                task = new Task(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
+                break;
+
+            case SUBTASK:
+                task = new Subtask(receivedStr[2], receivedStr[4], TaskStatus.valueOf(receivedStr[3]), Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
+                ((Subtask) task).setEpicId(Integer.valueOf(receivedStr[5]));
+                break;
+
+            case EPIC:
+                task = new Epic(receivedStr[2], receivedStr[4], Integer.valueOf(receivedStr[0]), Instant.parse(receivedStr[7].trim()), Integer.parseInt(receivedStr[6]));
+                break;
+
         }
+        return task;
     }
-
-
-
 
     @Override
     public void deleteAllTasks() {
