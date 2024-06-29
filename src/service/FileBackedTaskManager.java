@@ -170,31 +170,37 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     static Task fromString(String value) {
-        String[] parts = value.split(",");
-        int id = Integer.parseInt(parts[0].trim());
-        TaskType type = TaskType.valueOf(parts[1].trim());
-        String name = parts[2].trim();
-        TaskStatus status = TaskStatus.valueOf(parts[3].trim());
-        String description = parts[4].trim();
-        int duration = Integer.parseInt(parts[6].trim());
-        Instant startTime = Instant.parse(parts[7].trim());
-        Task task = null;
+        try {
+            String[] parts = value.split(",");
+            int id = Integer.parseInt(parts[0].trim());
+            TaskType type = TaskType.valueOf(parts[1].trim());
+            String name = parts[2].trim();
+            TaskStatus status = TaskStatus.valueOf(parts[3].trim());
+            String description = parts[4].trim();
+            int duration = parts.length > 6 ? Integer.parseInt(parts[6].trim()) : 0;
+            Instant startTime = parts.length > 7 && !parts[7].trim().equals("null") ? Instant.parse(parts[7].trim()) : Instant.now();  // Обработка null для времени начала
+            Task task = null;
 
-        switch (type) {
-            case TASK:
-                task = new Task(name, description, status, id, startTime, duration);
-                break;
-            case SUBTASK:
-                int epicId = Integer.parseInt(parts[5].trim());
-                task = new Subtask(name, description, status, id, startTime, duration);
-                ((Subtask) task).setEpicId(epicId);
-                break;
-            case EPIC:
-                task = new Epic(name, description, id, startTime, duration);
-                break;
+            switch (type) {
+                case TASK:
+                    task = new Task(name, description, status, id, startTime, duration);
+                    break;
+                case SUBTASK:
+                    int epicId = Integer.parseInt(parts[5].trim());
+                    task = new Subtask(name, description, status, id, startTime, duration);
+                    ((Subtask) task).setEpicId(epicId);
+                    break;
+                case EPIC:
+                    task = new Epic(name, description, id, startTime, duration);
+                    break;
+            }
+            return task;
+        } catch (NumberFormatException e) {
+            System.err.println("Ошибка преобразования числа в строке: " + value);
+            return null;
         }
-        return task;
     }
+
 
 
     @Override
