@@ -110,8 +110,8 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
         fileBackedTaskManagerWithFile.createTask(taskInstant1);
         fileBackedTaskManagerWithFile.createTask(taskInstant2);
 
-/*        fileBackedTaskManagerWithFile.getTaskPerId(taskInstant1.getTaskId());
-        fileBackedTaskManagerWithFile.getTaskPerId(taskInstant2.getTaskId());*/
+        fileBackedTaskManagerWithFile.getTaskPerId(taskInstant1.getTaskId());
+        fileBackedTaskManagerWithFile.getTaskPerId(taskInstant2.getTaskId());
 
         fileBackedTaskManagerWithFile.deleteTaskById(taskInstant2.getTaskId());
 
