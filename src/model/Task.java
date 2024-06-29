@@ -144,8 +144,6 @@ public class Task {
                 '}';
     }
 
-
-
     public Instant getStartTime() {
         return this.startTime;
     }
@@ -158,7 +156,6 @@ public class Task {
     public int getDuration() {
         return this.duration;
     }
-
 
 
 }
