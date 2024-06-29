@@ -90,11 +90,13 @@ public class InMemoryHistoryManager implements HistoryManager {
         history.remove(node.item.getTaskId());
         node.item = null;
     }
+
     private static class Node {
 
         Task item;
         Node next;
         Node prev;
+
         Node(Node prev, Task element, Node next) {
 
             this.item = element;
