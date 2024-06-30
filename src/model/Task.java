@@ -2,7 +2,6 @@ package model;
 import java.time.*;
 
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 
 public class Task {
     private String taskName;
@@ -86,6 +85,7 @@ public class Task {
     }
 
 
+
     public TaskType getType() {
         return TaskType.TASK;
     }
@@ -144,8 +144,6 @@ public class Task {
                 '}';
     }
 
-
-
     public Instant getStartTime() {
         return this.startTime;
     }
@@ -154,11 +152,9 @@ public class Task {
         return this.endTime;
     }
 
-    
     public int getDuration() {
         return this.duration;
     }
-
 
 
 }

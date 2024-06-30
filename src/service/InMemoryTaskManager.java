@@ -1,9 +1,8 @@
 package service;
 
-import OwnExceptions.NotFoundException;
+import ownexceptions.NotFoundException;
 import model.*;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,7 +43,7 @@ public class InMemoryTaskManager implements TaskManager {
             return task;
         }
 
-        if (checkTaskTime(task) ) {
+        if (checkTaskTime(task)) {
             throw new IllegalStateException("Задача пересекается с уже существующей");
         }
 
@@ -102,13 +101,10 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NotFoundException("Task id=" + task.getTaskId());
         }
 
-        if (!checkTaskTime(task) ) {
+        if (!checkTaskTime(task)) {
             prioritizedTasks.remove(initial);
             add(task);
         }
-//        prioritizedTasks.remove(initial);
-//        prioritizedTasks.add(task);
-
 
         tasks.put(task.getTaskId(), task);
     }
@@ -116,7 +112,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     public void add(Task task) {
 
-        if (prioritizedTasks.stream().anyMatch( existingTask -> checkTaskTime(task))) {
+        if (prioritizedTasks.stream().anyMatch(existingTask -> checkTaskTime(task))) {
             throw new IllegalStateException("Задачи пересекаются");
         } else {
             prioritizedTasks.add(task);
@@ -149,7 +145,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.put(subtask.getTaskId(), subtask);
 
 
-        if (!checkTaskTime(subtask) ) {
+        if (!checkTaskTime(subtask)) {
             prioritizedTasks.remove(initial);
             add(subtask);
         }
@@ -166,7 +162,7 @@ public class InMemoryTaskManager implements TaskManager {
                 continue;
             }
 
-            if (!( task.getEndTime().isBefore(existing.getStartTime()) || task.getStartTime().isAfter(existing.getEndTime())) ) {
+            if (!(task.getEndTime().isBefore(existing.getStartTime()) || task.getStartTime().isAfter(existing.getEndTime()))) {
                 return true; // пересекаются
             }
         }
@@ -412,11 +408,11 @@ public class InMemoryTaskManager implements TaskManager {
 
             Subtask subtask = subtasks.get(subId);
 
-            if (epic.getStartTime() == null || subtask.getStartTime().isBefore(epic.getStartTime() )) {
+            if (epic.getStartTime() == null || subtask.getStartTime().isBefore(epic.getStartTime())) {
                 epic.setStartTime(subtask.getStartTime());
             }
 
-            if (epic.getEndTime() == null || subtask.getEndTime().isAfter(epic.getEndTime()) ) {
+            if (epic.getEndTime() == null || subtask.getEndTime().isAfter(epic.getEndTime())) {
                 epic.setEndTime(subtask.getEndTime());
             }
 

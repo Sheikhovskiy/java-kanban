@@ -4,7 +4,6 @@ import model.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
@@ -27,7 +26,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public List<Task> getHistory(){
+    public List<Task> getHistory() {
         ArrayList<Task> list = new ArrayList<>();
         Node current = first;
 
@@ -49,7 +48,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
 
 
-    void linkLast (Task task) {
+    void linkLast(Task task) {
 
         final Node l = last;
         final Node newNode = new Node(l, task, null);
@@ -91,11 +90,13 @@ public class InMemoryHistoryManager implements HistoryManager {
         history.remove(node.item.getTaskId());
         node.item = null;
     }
+
     private static class Node {
 
         Task item;
         Node next;
         Node prev;
+
         Node(Node prev, Task element, Node next) {
 
             this.item = element;
